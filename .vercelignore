@@ -1,0 +1,11 @@
+# Notes, agent tooling and local build state: not needed to build the site.
+instructions.MD
+AGENTS.md
+README.md
+skills-lock.json
+.claude
+.paradev
+tsconfig.tsbuildinfo
+.next
+node_modules
+.env*
