@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { hold, onReveal } from '@/lib/boot';
 import { projects } from '@/lib/projects';
 import { TLink } from './Transition';
 
@@ -98,7 +99,17 @@ export default function World() {
     const stars = Array.from({ length: 150 }, () => ({
       x: starRand(), y: starRand(), s: 0.4 + starRand() * 1.6, ph: starRand() * 6.28, b: 0.25 + starRand() * 0.6,
     }));
-    const start = performance.now();
+    // The figures resolve out of static once the loading curtain starts to lift, not before.
+    let start = Infinity;
+    const shown = onReveal(() => {
+      start = performance.now();
+    });
+    const holds = {
+      fog: hold('Rolling in the fog'),
+      glyphs: hold('Cutting the characters'),
+      scene: hold('Drawing the scene'),
+    };
+    let frames = 0;
 
     const size = () => {
       const w = window.innerWidth;
@@ -403,7 +414,7 @@ export default function World() {
       const dt = Math.min(0.05, (now - last) / 1000);
       last = now;
       const t = still ? 12 : now / 1000;
-      const intro = still ? 1 : Math.min(1, (now - start) / 1800);
+      const intro = still ? 1 : Math.max(0, Math.min(1, (now - start) / 1800));
       const tick = still ? 3 : Math.floor(now / 110);
       const hy = lay.horizon * sh;
       for (const pr of projects) {
@@ -426,16 +437,24 @@ export default function World() {
       drawPond(lay.boxes.tidepool, t, p('tidepool'), dt);
       noise(lay.boxes.tidepool, static_('tidepool') * 0.6, tick + 4);
       field?.redraw();
+      // Two frames in, the scene is really on the glass.
+      if (++frames === 2) holds.scene();
     };
 
     (async () => {
+      // Both downloads start at once; only the mounting waits for the typeface.
+      const weather =
+        !still && fogEl.current
+          ? Promise.all([import('three'), import('vanta/dist/vanta.fog.min')]).catch(() => null)
+          : Promise.resolve(null);
+      const engine = import('asciify-engine/field').catch(() => null);
       await document.fonts.ready.catch(() => {});
-      if (dead) return;
       // Vanta's fog is the weather: it renders off to the side and the scene samples it.
-      if (!still && fogEl.current) {
+      const mods = await weather;
+      if (dead) return;
+      if (mods && fogEl.current) {
         try {
-          const [THREE, FOG] = await Promise.all([import('three'), import('vanta/dist/vanta.fog.min')]);
-          if (dead) return;
+          const [THREE, FOG] = mods;
           fog = FOG.default({
             el: fogEl.current, THREE, mouseControls: true, touchControls: true, gyroControls: false,
             minHeight: 100, minWidth: 100, scale: 4, scaleMobile: 4,
@@ -446,9 +465,12 @@ export default function World() {
           fog = null;
         }
       }
+      holds.fog();
+      const mod = await engine;
+      if (dead) return;
       try {
-        const { mountGlyphField, isGlyphFieldSupported } = await import('asciify-engine/field');
-        if (dead) return;
+        if (!mod) throw new Error('no engine');
+        const { mountGlyphField, isGlyphFieldSupported } = mod;
         const soft = new URLSearchParams(window.location.search).has('soft');
         if (!isGlyphFieldSupported({ allowSoftware: soft })) throw new Error('no gpu');
         const small = window.innerWidth < 700;
@@ -473,12 +495,15 @@ export default function World() {
       } catch {
         setPlain(true);
       }
+      holds.glyphs();
       raf = requestAnimationFrame(frame);
     })();
 
     return () => {
       dead = true;
       cancelAnimationFrame(raf);
+      shown();
+      Object.values(holds).forEach((release) => release());
       window.removeEventListener('resize', size);
       window.removeEventListener('pointermove', move);
       field?.destroy();

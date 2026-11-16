@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { hold } from '@/lib/boot';
 
 type Props = {
   // A picture to draw in characters, or leave it out for one of the engine's generated scenes.
@@ -18,6 +19,7 @@ export default function GlyphField({ src, scene = 'constellation', label, classN
   useEffect(() => {
     let dead = false;
     let field: { destroy: () => void } | null = null;
+    const ready = hold('Cutting the characters');
     (async () => {
       try {
         await document.fonts.ready.catch(() => {});
@@ -40,9 +42,11 @@ export default function GlyphField({ src, scene = 'constellation', label, classN
       } catch {
         if (!dead) setFailed(true);
       }
+      ready();
     })();
     return () => {
       dead = true;
+      ready();
       field?.destroy();
     };
   }, [src, scene, label, cellSize]);

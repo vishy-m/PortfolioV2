@@ -7,7 +7,8 @@ import { site } from '@/lib/site';
 import './globals.css';
 import '@/components/reactbits/TargetCursor.css';
 
-const display = Doto({ subsets: ['latin'], variable: '--font-display', weight: 'variable' });
+// The name is the first thing on screen, so it waits for its own face rather than flashing a stand-in.
+const display = Doto({ subsets: ['latin'], variable: '--font-display', weight: 'variable', display: 'block' });
 const mono = Martian_Mono({ subsets: ['latin'], variable: '--font-mono', weight: 'variable', axes: ['wdth'] });
 
 export const metadata: Metadata = {
@@ -20,6 +21,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${display.variable} ${mono.variable}`}>
       <body>
+        <noscript>
+          <style>{'.loader{display:none}'}</style>
+        </noscript>
         <Shell hasResume={hasResume}>{children}</Shell>
       </body>
     </html>

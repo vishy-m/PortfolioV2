@@ -7,6 +7,7 @@ import Lenis from 'lenis';
 import { TLink, TransitionProvider } from './Transition';
 import TargetCursor from './reactbits/TargetCursor';
 import DecryptedText from './reactbits/DecryptedText';
+import Loader from './Loader';
 import { site } from '@/lib/site';
 
 function SmoothScroll() {
@@ -47,6 +48,7 @@ export default function Shell({ children, hasResume }: { children: ReactNode; ha
   const home = pathname === '/';
   return (
     <TransitionProvider>
+      <Loader />
       <SmoothScroll />
       <Cursor />
       <header className={`top${home ? ' top-home' : ''}`}>
