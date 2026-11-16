@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Doto, Martian_Mono } from 'next/font/google';
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
+import { Analytics } from '@vercel/analytics/next';
 import Shell from '@/components/Shell';
 import { site } from '@/lib/site';
 import './globals.css';
@@ -25,6 +26,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <style>{'.loader{display:none}'}</style>
         </noscript>
         <Shell hasResume={hasResume}>{children}</Shell>
+        <Analytics />
       </body>
     </html>
   );
