@@ -12,7 +12,8 @@ export type Project = {
   sections: { title: string; body: string[]; diagram?: string }[];
   links: { label: string; href: string }[];
   // The first image leads the page; the rest make up the gallery. `alt` is also the caption.
-  images: { src: string; alt: string; w: number; h: number }[];
+  // Gallery images start in colour; set `dither: true` to start one dithered instead.
+  images: { src: string; alt: string; w: number; h: number; dither?: boolean }[];
   // Used for the hero when there is no image yet.
   scene?: 'constellation' | 'contour' | 'ripple' | 'mesh';
 };
@@ -83,10 +84,10 @@ export const projects: Project[] = [
     ],
     images: [
       { src: '/work/toyyo/garage.jpg', alt: 'The opening screen: seven Toyotas drift across a black stage as 3D models', w: 1600, h: 1000 },
-      { src: '/work/toyyo/dashboard.jpg', alt: 'A leased Corolla Cross: two warning lights are on, for mileage and fuel, next to the monthly cost', w: 1600, h: 1000 },
-      { src: '/work/toyyo/finances.jpg', alt: 'Finances: the lease terms, the best next move and a slider to try a different mileage', w: 1600, h: 1000 },
-      { src: '/work/toyyo/driving.jpg', alt: 'Driving: the score, what moves it, recent trips and a replay of one drive on a 3D map', w: 1600, h: 1000 },
-      { src: '/work/toyyo/supra.jpg', alt: 'A financed GR Supra, where the lights point at the payment date, coverage and driving score', w: 1600, h: 1000 },
+      { src: '/work/toyyo/dashboard.jpg', alt: 'A leased Corolla Cross: two warning lights are on, for mileage and fuel, next to the monthly cost', w: 1600, h: 1000 , dither: true },
+      { src: '/work/toyyo/finances.jpg', alt: 'Finances: the lease terms, the best next move and a slider to try a different mileage', w: 1600, h: 1000 , dither: true },
+      { src: '/work/toyyo/driving.jpg', alt: 'Driving: the score, what moves it, recent trips and a replay of one drive on a 3D map', w: 1600, h: 1000 , dither: true },
+      { src: '/work/toyyo/supra.jpg', alt: 'A financed GR Supra, where the lights point at the payment date, coverage and driving score', w: 1600, h: 1000 , dither: true },
     ],
   },
   {

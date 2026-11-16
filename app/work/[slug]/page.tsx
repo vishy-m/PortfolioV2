@@ -81,7 +81,7 @@ export default async function Work({ params }: Params) {
       {rest.length > 0 && (
         <div className="gallery">
           {rest.map((img) => (
-            <FlutedImage key={img.src} {...img} color />
+            <FlutedImage key={img.src} {...img} color={!img.dither} />
           ))}
         </div>
       )}
