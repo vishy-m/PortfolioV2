@@ -636,7 +636,6 @@ export default function World() {
             >
               <span className="hot-label">
                 <b>{pr.name}</b>
-                <i>{pr.figure}</i>
               </span>
             </TLink>
           );
