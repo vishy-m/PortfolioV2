@@ -382,7 +382,7 @@ export const projects: Project[] = [
     name: 'Bastion of the Artifact',
     summary:
       'A base-building tower-defense game in Unreal Engine 5: a runaway knight guards a stolen artifact from the kingdom that wants it back. I built the movement, the animation and most of the weapons.',
-    figure: 'The orb behind the wall',
+    figure: 'The knight',
     facts: [
       { k: 'My part', v: 'All of the movement and animation, most of the weapons', hot: true },
       { k: 'Kind', v: 'Class project for Video Game Programming 2, team of ten' },

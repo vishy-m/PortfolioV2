@@ -21,7 +21,7 @@ function layoutFor(aspect: number): Layout {
         toyyo: { x: 0.42, y: 0.57, w: 0.46, h: 0.08 },
         tidepool: { x: 0.04, y: 0.77, w: 0.5, h: 0.12, label: 'above' },
         naugh: { x: 0.84, y: 0.405, w: 0.12, h: 0.105, label: 'below-end' },
-        bastion: { x: 0.6, y: 0.79, w: 0.32, h: 0.12, label: 'above-end' },
+        bastion: { x: 0.64, y: 0.775, w: 0.26, h: 0.14, label: 'above-end' },
       },
     };
   }
@@ -34,7 +34,7 @@ function layoutFor(aspect: number): Layout {
       toyyo: { x: 0.55, y: 0.635, w: 0.2, h: 0.11 },
       tidepool: { x: 0.1, y: 0.78, w: 0.34, h: 0.16, label: 'above' },
       naugh: { x: 0.855, y: 0.36, w: 0.085, h: 0.24, label: 'left' },
-      bastion: { x: 0.05, y: 0.48, w: 0.12, h: 0.12 },
+      bastion: { x: 0.2, y: 0.34, w: 0.1, h: 0.26, label: 'left' },
     },
   };
 }
@@ -446,40 +446,63 @@ export default function World() {
       ctx.fill();
     };
 
-    // Bastion of the Artifact: the glowing artifact on its pedestal, behind a wall of sharpened stakes.
-    const drawBastion = (b: Box, t: number, p: number) => {
+    // Bastion of the Artifact: the knight, shield up and sword raised. Point at him and the blade catches fire.
+    const drawKnight = (b: Box, t: number, p: number) => {
       const q = px(b);
-      const cx = q.x + q.w / 2;
-      const s = Math.min(q.w, q.h);
-      const r = s * 0.16;
-      const oy = q.y + q.h * 0.28 + Math.sin(t * 1.4) * s * 0.03;
-      // The glow breathes, and quickens while you point at it.
-      const halo = ctx.createRadialGradient(cx, oy, r * 0.6, cx, oy, r * (2.4 + 0.5 * Math.sin(t * (2 + p * 4))));
-      halo.addColorStop(0, tone(p, 0.4 + p * 0.3));
-      halo.addColorStop(1, tone(p, 0));
-      ctx.fillStyle = halo;
-      ctx.fillRect(cx - r * 3, oy - r * 3, r * 6, r * 6);
-      ctx.fillStyle = tone(p, 0.6);
-      ctx.fillRect(cx - s * 0.15, q.y + q.h * 0.48, s * 0.3, q.h * 0.05);
-      ctx.fillRect(cx - s * 0.08, q.y + q.h * 0.53, s * 0.16, q.h * 0.27);
-      ctx.fillStyle = tone(p, 0.92 + p * 0.08);
-      ctx.beginPath();
-      ctx.arc(cx, oy, r, 0, 6.3);
-      ctx.fill();
-      ctx.fillStyle = tone(p, 0.8 + p * 0.2);
-      const n = 9;
-      const step = q.w / n;
-      for (let i = 0; i < n; i++) {
-        const x0 = q.x + i * step + step * 0.1;
-        const w = step * 0.8;
-        const top = q.y + q.h * (i % 2 ? 0.74 : 0.68);
+      const W = Math.min(q.w, q.h * 0.62);
+      const ox = q.x + (q.w - W) / 2;
+      const lift = Math.sin(t * 1.8) * q.h * 0.008;
+      const X = (f: number) => ox + W * f;
+      const Y = (f: number) => q.y + q.h * f + lift;
+      const poly = (pts: number[][]) => {
         ctx.beginPath();
-        ctx.moveTo(x0, q.y + q.h);
-        ctx.lineTo(x0, top + w * 0.6);
-        ctx.lineTo(x0 + w / 2, top);
-        ctx.lineTo(x0 + w, top + w * 0.6);
-        ctx.lineTo(x0 + w, q.y + q.h);
+        pts.forEach(([x, y], i) => (i ? ctx.lineTo(X(x), Y(y)) : ctx.moveTo(X(x), Y(y))));
+        ctx.closePath();
         ctx.fill();
+      };
+      // Plume, streaming back off the helmet.
+      const sway = Math.sin(t * 2.2) * 0.04;
+      ctx.fillStyle = tone(p, 0.55);
+      ctx.beginPath();
+      ctx.moveTo(X(0.5), Y(0.07));
+      ctx.quadraticCurveTo(X(0.36), Y(-0.02), X(0.16 + sway), Y(0.08 + sway));
+      ctx.quadraticCurveTo(X(0.34), Y(0.05), X(0.46), Y(0.12));
+      ctx.fill();
+      ctx.fillStyle = tone(p, 0.86 + p * 0.14);
+      // Helmet: a dome over a short cylinder.
+      ctx.beginPath();
+      ctx.arc(X(0.5), Y(0.15), W * 0.17, Math.PI, 0);
+      ctx.lineTo(X(0.67), Y(0.27));
+      ctx.lineTo(X(0.33), Y(0.27));
+      ctx.fill();
+      // Shoulders and breastplate, waist, legs and feet.
+      poly([[0.24, 0.3], [0.76, 0.3], [0.68, 0.54], [0.32, 0.54]]);
+      poly([[0.33, 0.54], [0.67, 0.54], [0.69, 0.63], [0.31, 0.63]]);
+      poly([[0.34, 0.63], [0.47, 0.63], [0.44, 0.95], [0.3, 0.95]]);
+      poly([[0.53, 0.63], [0.66, 0.63], [0.7, 0.95], [0.56, 0.95]]);
+      poly([[0.24, 0.95], [0.45, 0.95], [0.45, 1], [0.22, 1]]);
+      poly([[0.55, 0.95], [0.76, 0.95], [0.78, 1], [0.55, 1]]);
+      // Sword arm, and the sword held point up beside the helmet.
+      poly([[0.7, 0.31], [0.8, 0.33], [0.84, 0.52], [0.76, 0.53]]);
+      poly([[0.82, 0.02], [0.88, 0.02], [0.88, 0.47], [0.82, 0.47]]);
+      poly([[0.75, 0.47], [0.95, 0.47], [0.95, 0.5], [0.75, 0.5]]);
+      // Kite shield on the other arm.
+      poly([[0.06, 0.32], [0.36, 0.32], [0.36, 0.5], [0.21, 0.68], [0.06, 0.5]]);
+      // Dark details: visor slit, belt and the cross on the shield.
+      ctx.fillStyle = '#000';
+      ctx.fillRect(X(0.37), Y(0.165), W * 0.26, q.h * 0.03);
+      ctx.fillRect(X(0.32), Y(0.535), W * 0.36, q.h * 0.02);
+      ctx.fillRect(X(0.195), Y(0.36), W * 0.03, q.h * 0.26);
+      ctx.fillRect(X(0.1), Y(0.43), W * 0.22, q.h * 0.02);
+      // Fire runs up the blade, like the fire sword in the game.
+      if (p > 0.05) {
+        for (let i = 0; i < 7; i++) {
+          const k = (t * 1.7 + i / 7) % 1;
+          ctx.fillStyle = tone(p, p * (1 - k) * 0.9);
+          ctx.beginPath();
+          ctx.arc(X(0.85 + Math.sin(t * 9 + i * 2.1) * 0.05 * k), Y(0.45 - k * 0.45), W * (0.07 - k * 0.04), 0, 6.3);
+          ctx.fill();
+        }
       }
     };
 
@@ -508,7 +531,7 @@ export default function World() {
       drawGround(t, hy, lay.road * sh, 0.6 + p('toyyo') * 2.4);
       drawTower(lay.boxes.naugh, t, p('naugh'));
       noise(lay.boxes.naugh, static_('naugh'), tick + 5);
-      drawBastion(lay.boxes.bastion, t, p('bastion'));
+      drawKnight(lay.boxes.bastion, t, p('bastion'));
       noise(lay.boxes.bastion, static_('bastion'), tick + 6);
       drawSteer(lay.boxes.ratemyclub, t, p('ratemyclub'));
       noise(lay.boxes.ratemyclub, static_('ratemyclub'), tick + 2);
@@ -570,7 +593,7 @@ export default function World() {
           fluid: { radius: 0.06, refraction: 0.018, glow: 0.7 },
           tap: 'ring',
           label:
-            'A night scene drawn in characters: a constellation, a longhorn, a car on a road, a koi pond, a tower on a hill and an orb behind a wall. Each one opens a project.',
+            'A night scene drawn in characters: a constellation, a longhorn, a car on a road, a koi pond, a tower on a hill and a knight with a sword. Each one opens a project.',
         });
       } catch {
         setPlain(true);
