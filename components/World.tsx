@@ -2,11 +2,11 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { hold, onReveal } from '@/lib/boot';
-import { projects } from '@/lib/projects';
+import { projects, type Slug } from '@/lib/projects';
 import { TLink } from './Transition';
 
 type Box = { x: number; y: number; w: number; h: number };
-type Layout = { horizon: number; road: number; boxes: Record<string, Box> };
+type Layout = { horizon: number; road: number; boxes: Record<Slug, Box> };
 
 // Positions are fractions of the viewport, so the scene re-composes for phones.
 function layoutFor(aspect: number): Layout {
@@ -151,7 +151,6 @@ export default function World() {
     const drawSky = (t: number, hy: number) => {
       if (fog) {
         try {
-          fog.renderer.render(fog.scene, fog.camera);
           // Multiplying the fog by itself keeps the cloud cores and drops the haze between them.
           ctx.drawImage(fog.renderer.domElement, 0, 0, sw, hy);
           ctx.globalCompositeOperation = 'multiply';

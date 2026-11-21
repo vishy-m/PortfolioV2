@@ -12,7 +12,7 @@ export default function About() {
   const has = (f: string) => existsSync(join(process.cwd(), 'public', f));
   const contacts = [
     site.email && { label: site.email, href: `mailto:${site.email}` },
-    { label: 'GitHub', href: site.github },
+    site.github && { label: 'GitHub', href: site.github },
     site.linkedin && { label: 'LinkedIn', href: site.linkedin },
     has(site.resumeFile) && { label: 'Resume (PDF)', href: `/${site.resumeFile}` },
   ].filter(Boolean) as { label: string; href: string }[];

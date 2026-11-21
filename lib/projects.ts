@@ -1,5 +1,7 @@
+export type Slug = 'toyyo' | 'assistant' | 'ratemyclub' | 'tidepool' | 'naugh';
+
 export type Project = {
-  slug: string;
+  slug: Slug;
   name: string;
   summary: string;
   // What the figure in the home scene is, in plain words.

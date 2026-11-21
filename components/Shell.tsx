@@ -68,9 +68,11 @@ export default function Shell({ children, hasResume }: { children: ReactNode; ha
               <DecryptedText text="Resume" {...scramble} />
             </a>
           )}
-          <a href={site.github} className="cursor-target" target="_blank" rel="noreferrer">
-            <DecryptedText text="GitHub" {...scramble} />
-          </a>
+          {site.github && (
+            <a href={site.github} className="cursor-target" target="_blank" rel="noreferrer">
+              <DecryptedText text="GitHub" {...scramble} />
+            </a>
+          )}
         </nav>
       </header>
       {children}
