@@ -19,6 +19,7 @@ function layoutFor(aspect: number): Layout {
         ratemyclub: { x: 0.03, y: 0.39, w: 0.38, h: 0.13 },
         toyyo: { x: 0.42, y: 0.57, w: 0.46, h: 0.08 },
         tidepool: { x: 0.08, y: 0.77, w: 0.76, h: 0.12 },
+        naugh: { x: 0.84, y: 0.405, w: 0.12, h: 0.105 },
       },
     };
   }
@@ -30,6 +31,7 @@ function layoutFor(aspect: number): Layout {
       ratemyclub: { x: 0.34, y: 0.38, w: 0.22, h: 0.22 },
       toyyo: { x: 0.55, y: 0.635, w: 0.2, h: 0.11 },
       tidepool: { x: 0.1, y: 0.78, w: 0.34, h: 0.16 },
+      naugh: { x: 0.855, y: 0.36, w: 0.085, h: 0.24 },
     },
   };
 }
@@ -407,6 +409,41 @@ export default function World() {
       });
     };
 
+    // The castle from The Island of Naugh: a tower on the far hill, a flag on top and a lit, barred cell window.
+    const drawTower = (b: Box, t: number, p: number) => {
+      const q = px(b);
+      const X = (f: number) => q.x + q.w * f;
+      const Y = (f: number) => q.y + q.h * f;
+      const rect = (x0: number, y0: number, x1: number, y1: number) => ctx.fillRect(X(x0), Y(y0), X(x1) - X(x0), Y(y1) - Y(y0));
+      ctx.fillStyle = tone(p, 0.7);
+      rect(0.48, 0, 0.52, 0.2);
+      const wave = Math.sin(t * 3) * 0.03;
+      ctx.beginPath();
+      ctx.moveTo(X(0.52), Y(0.01));
+      ctx.quadraticCurveTo(X(0.68), Y(0.03 + wave), X(0.86), Y(0.06 + wave));
+      ctx.lineTo(X(0.52), Y(0.11));
+      ctx.fill();
+      ctx.fillStyle = tone(p, 0.82 + p * 0.18);
+      for (const x of [0.1, 0.32, 0.56, 0.78]) rect(x, 0.2, x + 0.12, 0.27);
+      rect(0.1, 0.27, 0.9, 0.34);
+      rect(0.18, 0.34, 0.82, 1);
+      ctx.fillStyle = 'rgba(0,0,0,0.35)';
+      rect(0.62, 0.34, 0.82, 1);
+      ctx.fillStyle = '#000';
+      rect(0.34, 0.46, 0.66, 0.62);
+      // Torchlight behind the bars; it burns brighter while you point at the tower.
+      ctx.fillStyle = tone(p, 0.5 + 0.25 * Math.sin(t * 9) * Math.sin(t * 2.3) + p * 0.3);
+      rect(0.37, 0.49, 0.63, 0.59);
+      ctx.fillStyle = '#000';
+      for (const x of [0.43, 0.53]) rect(x, 0.46, x + 0.05, 0.62);
+      ctx.beginPath();
+      ctx.moveTo(X(0.38), Y(1));
+      ctx.lineTo(X(0.38), Y(0.84));
+      ctx.quadraticCurveTo(X(0.5), Y(0.72), X(0.62), Y(0.84));
+      ctx.lineTo(X(0.62), Y(1));
+      ctx.fill();
+    };
+
     let last = performance.now();
     const frame = (now: number) => {
       if (dead) return;
@@ -430,6 +467,8 @@ export default function World() {
       drawGraph(lay.boxes.assistant, t, p('assistant'));
       noise(lay.boxes.assistant, static_('assistant') * 0.5, tick + 1);
       drawGround(t, hy, lay.road * sh, 0.6 + p('toyyo') * 2.4);
+      drawTower(lay.boxes.naugh, t, p('naugh'));
+      noise(lay.boxes.naugh, static_('naugh'), tick + 5);
       drawSteer(lay.boxes.ratemyclub, t, p('ratemyclub'));
       noise(lay.boxes.ratemyclub, static_('ratemyclub'), tick + 2);
       drawCar(lay.boxes.toyyo, t, p('toyyo'));
@@ -490,7 +529,7 @@ export default function World() {
           fluid: { radius: 0.06, refraction: 0.018, glow: 0.7 },
           tap: 'ring',
           label:
-            'A night scene drawn in characters: a constellation, a longhorn, a car on a road and a koi pond. Each one opens a project.',
+            'A night scene drawn in characters: a constellation, a longhorn, a car on a road, a koi pond and a tower on a hill. Each one opens a project.',
         });
       } catch {
         setPlain(true);

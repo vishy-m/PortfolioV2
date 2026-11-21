@@ -322,6 +322,59 @@ export const projects: Project[] = [
       { src: '/work/tidepool/eco-lake.png', alt: 'The lake at the far end of the Ecosystem, with cranes', w: 1440, h: 810 },
     ],
   },
+  {
+    slug: 'naugh',
+    name: 'The Island of Naugh',
+    summary:
+      'A top-down action game: escape a demon’s castle dungeon in five minutes. We built it in C# for a class; I ported it to the browser, so you can play all of it here.',
+    figure: 'The tower on the hill',
+    facts: [
+      { k: 'Play it', v: 'In the browser, all three floors', hot: true },
+      { k: 'Kind', v: 'Class project, team of four; ported to the web in November 2026' },
+      { k: 'Built with', v: 'C# and XNA, then TypeScript, Canvas 2D and Web Audio' },
+      { k: 'Controls', v: 'Keyboard or gamepad, so not on a phone' },
+    ],
+    body: [
+      'The Island of Naugh began as a team project for a Video Game Programming class, written in C# with Microsoft’s XNA framework. Lightning splits your boat in a storm, and you wake in the castle dungeon of the demon Chax with five minutes to fight your way out.',
+      'XNA runs only on Windows and Microsoft stopped developing it in 2013, so the original is hard to run today. I ported it to TypeScript so it runs in any browser, keeping every sprite, sound, level map and line of dialogue from the original.',
+    ],
+    sections: [
+      {
+        title: 'Three floors, one clock',
+        body: [
+          'The dungeon comes first. The bars of your cell shock you only while you move, so you wait for them to go dark and slip out. Keys bounce around the room and only one opens the gate. It starts out tinted red, then turns white like the decoys a second after you leave the cell, and every decoy you grab spawns another. Past the gate are a sword and twenty husks.',
+          'The forest is a maze full of red spirits that drift through its walls. At the end waits Chax. He charges from a distance, opens a giant eye under you up close, and after five attacks summons knights and cannot be hurt until they are gone. One five-minute clock covers all three floors; it stops only while Chax is talking.',
+        ],
+      },
+      {
+        title: 'A port, not a remake',
+        body: [
+          'Each TypeScript module stands in for one or more of the original C# classes, and the game logic was carried over line by line: the same speeds, damage numbers, timers and animation frames. It runs at a fixed 60 updates a second, as XNA did, so it plays at the same speed on any screen.',
+          'The levels are the original text-file tile maps, loaded unchanged. The art was scaled down and the sounds converted from WAV to MP3, so the whole game is a download of under 4 MB.',
+        ],
+      },
+      {
+        title: 'What the browser needed',
+        body: [
+          'Browsers will not play sound until the visitor presses something, so the game now opens on a title screen. It pauses when its tab loses focus, a gamepad works through the browser’s Gamepad API, and the flashing cutscene backgrounds hold still for anyone who has turned on reduced motion.',
+        ],
+      },
+      {
+        title: 'Fixed on the way',
+        body: [
+          'Some of the original’s bugs did not make the move. Walls used direction-tagged tiles that let you sink in and get stuck; they now use a slightly smaller hitbox that slides you around corners. A dash no longer freezes when you let go of the keys. Chax’s first charge used to rush at the top-left corner of the map; now it winds up like the rest, and his charge and slam are telegraphed by a red line and a red square.',
+          'The dialogue is untouched, typos and all. It only types faster, and a line that arrives while another is showing now waits its turn instead of being dropped.',
+        ],
+      },
+    ],
+    links: [{ label: 'Play the game', href: '/play/island-of-naugh/index.html' }],
+    images: [
+      { src: '/work/naugh/title.jpg', alt: 'The title screen: Chax looms over the boat that carries you to the island', w: 1600, h: 1000 },
+      { src: '/work/naugh/dungeon.jpg', alt: 'The cell you start in: its bars shock you only while you move', w: 1600, h: 1000 },
+      { src: '/work/naugh/forest.jpg', alt: 'The forest, a maze where red spirits drift through the walls', w: 1600, h: 1000 },
+      { src: '/work/naugh/boss.jpg', alt: 'Chax, with his eye opening under the player', w: 1600, h: 1000 },
+    ],
+  },
 ];
 
 export const getProject = (slug: string) => projects.find((p) => p.slug === slug);
