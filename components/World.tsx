@@ -159,7 +159,7 @@ export default function World() {
           ctx.globalCompositeOperation = 'multiply';
           ctx.drawImage(fog.renderer.domElement, 0, 0, sw, hy);
           ctx.globalCompositeOperation = 'source-over';
-          ctx.fillStyle = 'rgba(0,0,0,0.6)';
+          ctx.fillStyle = 'rgba(0,0,0,0.72)';
           ctx.fillRect(0, 0, sw, hy);
         } catch {
           fog = null;
@@ -194,23 +194,23 @@ export default function World() {
       }
       ctx.lineTo(sw, hy);
       ctx.closePath();
-      ctx.fillStyle = tone(0, 0.2);
+      ctx.fillStyle = tone(0, 0.12);
       ctx.fill();
       const r = rng(31);
       for (let i = 0; i < 16; i++) {
         const bw = (0.012 + r() * 0.02) * sw;
         const bh = (0.02 + r() * 0.07) * sh;
-        ctx.fillStyle = tone(0, 0.1 + r() * 0.14);
+        ctx.fillStyle = tone(0, 0.06 + r() * 0.08);
         ctx.fillRect(r() * sw, hy - bh, bw, bh);
       }
-      ctx.fillStyle = tone(0, 0.5);
+      ctx.fillStyle = tone(0, 0.45);
       ctx.fillRect(0, hy, sw, 1);
       // Road: two edges and a centre line that runs under the car.
-      ctx.fillStyle = tone(0, 0.28);
+      ctx.fillStyle = tone(0, 0.26);
       ctx.fillRect(0, ry + sh * 0.03, sw, 1);
       const dash = sw * 0.035;
       const off = (t * speed * dash * 2) % (dash * 2);
-      ctx.fillStyle = tone(0, 0.4);
+      ctx.fillStyle = tone(0, 0.36);
       for (let x = -off; x < sw; x += dash * 2) ctx.fillRect(x, ry + sh * 0.055, dash, 1.5);
     };
 
@@ -225,7 +225,7 @@ export default function World() {
         ctx.closePath();
         ctx.fill();
       };
-      ctx.fillStyle = tone(p, 0.82 + p * 0.18);
+      ctx.fillStyle = tone(p, 0.95 + p * 0.05);
       // Tail first: it hangs off the rump and swings a little.
       const swing = Math.sin(t * 1.6) * 0.02;
       poly([[0.91, 0.42], [0.96, 0.44], [0.985 + swing, 0.76], [1 + swing, 0.9], [0.95 + swing, 0.9], [0.95 + swing * 0.6, 0.74]]);
@@ -278,7 +278,7 @@ export default function World() {
       ctx.lineTo(X(1.7), Y(0.3));
       ctx.lineTo(X(1.7), Y(0.98));
       ctx.fill();
-      ctx.fillStyle = tone(p, 0.86 + p * 0.14);
+      ctx.fillStyle = tone(p, 0.95 + p * 0.05);
       ctx.beginPath();
       ctx.moveTo(X(0.02), Y(0.78));
       ctx.lineTo(X(0.03), Y(0.5));
@@ -327,12 +327,12 @@ export default function World() {
       const cy = q.y + q.h / 2;
       const rx = q.w / 2;
       const ry = q.h / 2;
-      ctx.fillStyle = tone(p, 0.2 + p * 0.06);
+      ctx.fillStyle = tone(p, 0.28 + p * 0.06);
       ctx.beginPath();
       ctx.ellipse(cx, cy, rx, ry, 0, 0, 6.3);
       ctx.fill();
       ctx.lineWidth = 1.4 * u;
-      ctx.strokeStyle = tone(p, 0.55 + p * 0.35);
+      ctx.strokeStyle = tone(p, 0.75 + p * 0.2);
       ctx.stroke();
       for (let i = 0; i < 3; i++) {
         const k = (t * 0.16 + i / 3) % 1;
@@ -386,7 +386,7 @@ export default function World() {
       const q = px(b);
       const P = (i: number) => [q.x + NODES[i][0] * q.w, q.y + NODES[i][1] * q.h] as const;
       ctx.lineWidth = 1.5 * u;
-      ctx.strokeStyle = tone(p, 0.46 + p * 0.45);
+      ctx.strokeStyle = tone(p, 0.62 + p * 0.3);
       EDGES.forEach(([a, c], i) => {
         const [x0, y0] = P(a);
         const [x1, y1] = P(c);
@@ -425,7 +425,7 @@ export default function World() {
       ctx.quadraticCurveTo(X(0.68), Y(0.03 + wave), X(0.86), Y(0.06 + wave));
       ctx.lineTo(X(0.52), Y(0.11));
       ctx.fill();
-      ctx.fillStyle = tone(p, 0.82 + p * 0.18);
+      ctx.fillStyle = tone(p, 0.95 + p * 0.05);
       for (const x of [0.1, 0.32, 0.56, 0.78]) rect(x, 0.2, x + 0.12, 0.27);
       rect(0.1, 0.27, 0.9, 0.34);
       rect(0.18, 0.34, 0.82, 1);
@@ -468,7 +468,7 @@ export default function World() {
       ctx.quadraticCurveTo(X(0.36), Y(-0.02), X(0.16 + sway), Y(0.08 + sway));
       ctx.quadraticCurveTo(X(0.34), Y(0.05), X(0.46), Y(0.12));
       ctx.fill();
-      ctx.fillStyle = tone(p, 0.86 + p * 0.14);
+      ctx.fillStyle = tone(p, 0.95 + p * 0.05);
       // Helmet: a dome over a short cylinder.
       ctx.beginPath();
       ctx.arc(X(0.5), Y(0.15), W * 0.17, Math.PI, 0);
@@ -521,7 +521,7 @@ export default function World() {
         ease[pr.slug] = (ease[pr.slug] ?? 0) + (target - (ease[pr.slug] ?? 0)) * Math.min(1, dt * 9);
       }
       const p = (s: string) => ease[s] ?? 0;
-      const static_ = (s: string) => (1 - p(s)) * 0.42 + (1 - intro) * 1.6;
+      const static_ = (s: string) => (1 - p(s)) * 0.12 + (1 - intro) * 1.6;
 
       ctx.fillStyle = '#000';
       ctx.fillRect(0, 0, sw, sh);

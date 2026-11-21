@@ -27,7 +27,7 @@ function Cursor() {
   return (
     <TargetCursor
       targetSelector=".cursor-target"
-      cursorColor="#e9e6dc"
+      cursorColor="#ff6b1a"
       cursorColorOnTarget="#ff6b1a"
       blendMode="normal"
       showLabel={false}
