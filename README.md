@@ -1,6 +1,6 @@
 # Portfolio
 
-A night scene drawn in characters. Five figures in it are projects; select one to go in.
+A night scene drawn in characters. Six figures in it are projects; select one to go in.
 
     npm install
     npm run dev

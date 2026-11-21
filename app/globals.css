@@ -68,9 +68,10 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
   transition: opacity 0.18s, transform 0.18s;
   pointer-events: none;
 }
-.hot-tidepool .hot-label { top: auto; bottom: 100%; margin: 0 0 12px; }
-/* The tower stands at the right edge, so its label sits to its left. */
-.hot-naugh .hot-label { left: auto; right: 100%; top: auto; bottom: 0; margin: 0 12px 0 0; text-align: right; }
+.hot[data-label^='above'] .hot-label { top: auto; bottom: 100%; margin: 0 0 12px; }
+.hot[data-label$='end'] .hot-label { left: auto; right: 0; text-align: right; }
+.hot[data-label='below-end'] .hot-label { margin-top: 4px; }
+.hot[data-label='left'] .hot-label { left: auto; right: 100%; top: auto; bottom: 0; margin: 0 12px 0 0; text-align: right; }
 .hot.is-on .hot-label, .hot:focus-visible .hot-label { opacity: 1; transform: none; }
 .hot-label b, .index b { display: block; font-weight: 600; }
 .hot-label b { color: var(--accent); }
@@ -92,7 +93,6 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 
 @media (hover: none), (max-width: 700px) {
   .hot-label { opacity: 1; transform: none; }
-  .hot-naugh .hot-label { top: 100%; bottom: auto; right: 0; margin: 4px 0 0; }
   .index { display: none; }
 }
 

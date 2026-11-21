@@ -14,7 +14,7 @@ const mono = Martian_Mono({ subsets: ['latin'], variable: '--font-mono', weight:
 
 export const metadata: Metadata = {
   title: { default: site.name, template: `%s, ${site.name}` },
-  description: `${site.name}. ${site.line}. A portfolio you explore: five projects live inside a night scene drawn in characters.`,
+  description: `${site.name}. ${site.line}. A portfolio you explore: six projects live inside a night scene drawn in characters.`,
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

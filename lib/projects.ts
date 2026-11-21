@@ -1,4 +1,4 @@
-export type Slug = 'toyyo' | 'assistant' | 'ratemyclub' | 'tidepool' | 'naugh';
+export type Slug = 'toyyo' | 'assistant' | 'ratemyclub' | 'tidepool' | 'naugh' | 'bastion';
 
 export type Project = {
   slug: Slug;
@@ -375,6 +375,62 @@ export const projects: Project[] = [
       { src: '/work/naugh/dungeon.jpg', alt: 'The cell you start in: its bars shock you only while you move', w: 1600, h: 1000 },
       { src: '/work/naugh/forest.jpg', alt: 'The forest, a maze where red spirits drift through the walls', w: 1600, h: 1000 },
       { src: '/work/naugh/boss.jpg', alt: 'Chax, with his eye opening under the player', w: 1600, h: 1000 },
+    ],
+  },
+  {
+    slug: 'bastion',
+    name: 'Bastion of the Artifact',
+    summary:
+      'A base-building tower-defense game in Unreal Engine 5: a runaway knight guards a stolen artifact from the kingdom that wants it back. I built the movement, the animation and most of the weapons.',
+    figure: 'The orb behind the wall',
+    facts: [
+      { k: 'My part', v: 'All of the movement and animation, most of the weapons', hot: true },
+      { k: 'Kind', v: 'Class project for Video Game Programming 2, team of ten' },
+      { k: 'Built with', v: 'Unreal Engine 5, in Blueprints' },
+      { k: 'Plays on', v: 'PC, with keyboard and mouse' },
+    ],
+    body: [
+      'Bastion of the Artifact was the team project for a Video Game Programming 2 class: ten of us building one game in Unreal Engine 5, all in Blueprints, the engine’s visual scripting. You play a knight who deserted an evil kingdom and took the artifact it runs on, and the kingdom wants it back.',
+      'You chop trees and mine ore, smelt bars in a furnace, build a fort around the artifact and set turrets on its walls, then fight off the soldiers sent to take it. My part was the knight himself: how he moves, how he animates and how he fights.',
+    ],
+    sections: [
+      {
+        title: 'Moving like a knight',
+        body: [
+          'The knight walks, sprints, crouches, slides, dodges with a short roll and double jumps. Sprinting doubles his speed and drains a stamina bar that refills once he slows down, and C swaps the camera between first and third person at any time.',
+          'Movement lives in its own component on the character, with a named state for each kind of move, and sliding has a component of its own.',
+        ],
+      },
+      {
+        title: 'An animation layer per weapon',
+        body: [
+          'The knight has one base animation blueprint for moving, plus a separate animation layer for each weapon. Equip the sword and its layer supplies the idle, walk, run and jump; switch to the bow and the bow’s layer takes over. A new weapon brings its own layer instead of growing one huge graph.',
+          'The two emotes use the same layering, so adding a third is one more animation.',
+        ],
+      },
+      {
+        title: 'Weapons that share one blueprint',
+        body: [
+          'Every weapon is a child of one base weapon, which holds what they all need: where it rests on the body, where it sits in the hand, its animations, its basic stats and its attack. Picking one up attaches it at its resting spot; equipping plays a draw animation, and the weapon moves to the hand partway through it.',
+          'The sword attacks in a chain of three slashes. The bow draws, aims at a crosshair and fires arrows. The swords also come in fire, wind and lightning, each leaving its own trail.',
+        ],
+      },
+      {
+        title: 'My part',
+        body: [
+          'I built all of the movement and the animation behind it, and most of the weapons system. The rest of the team made the character and weapon models, the enemies, base building and the turrets, and the map with its day and night cycle.',
+        ],
+      },
+    ],
+    links: [],
+    images: [
+      { src: '/work/bastion/fire-sword.jpg', alt: 'A fire sword mid-swing, leaving a trail of flame', w: 1384, h: 745 },
+      { src: '/work/bastion/wind-sword.jpg', alt: 'The wind sword’s trail, with the hotbar below', w: 1409, h: 846 },
+      { src: '/work/bastion/lightning-sword.jpg', alt: 'The lightning sword and its purple trail', w: 1415, h: 710 },
+      { src: '/work/bastion/bow.jpg', alt: 'The bow: draw, aim at the crosshair, loose', w: 720, h: 586 },
+      { src: '/work/bastion/running.jpg', alt: 'The knight at a run', w: 1318, h: 1318 },
+      { src: '/work/bastion/artifact.jpg', alt: 'The artifact on its pedestal, the thing the whole game defends', w: 666, h: 374 },
+      { src: '/work/bastion/base.jpg', alt: 'An example base from the team’s building system: palisade, stone keep and stairs', w: 1205, h: 844 },
     ],
   },
 ];

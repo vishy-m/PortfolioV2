@@ -5,7 +5,8 @@ import { hold, onReveal } from '@/lib/boot';
 import { projects, type Slug } from '@/lib/projects';
 import { TLink } from './Transition';
 
-type Box = { x: number; y: number; w: number; h: number };
+// `label` says where a figure's name goes when the default spot, under it, is taken.
+type Box = { x: number; y: number; w: number; h: number; label?: 'above' | 'left' | 'below-end' | 'above-end' };
 type Layout = { horizon: number; road: number; boxes: Record<Slug, Box> };
 
 // Positions are fractions of the viewport, so the scene re-composes for phones.
@@ -18,8 +19,9 @@ function layoutFor(aspect: number): Layout {
         assistant: { x: 0.42, y: 0.27, w: 0.5, h: 0.13 },
         ratemyclub: { x: 0.03, y: 0.39, w: 0.38, h: 0.13 },
         toyyo: { x: 0.42, y: 0.57, w: 0.46, h: 0.08 },
-        tidepool: { x: 0.08, y: 0.77, w: 0.76, h: 0.12 },
-        naugh: { x: 0.84, y: 0.405, w: 0.12, h: 0.105 },
+        tidepool: { x: 0.04, y: 0.77, w: 0.5, h: 0.12, label: 'above' },
+        naugh: { x: 0.84, y: 0.405, w: 0.12, h: 0.105, label: 'below-end' },
+        bastion: { x: 0.6, y: 0.79, w: 0.32, h: 0.12, label: 'above-end' },
       },
     };
   }
@@ -30,8 +32,9 @@ function layoutFor(aspect: number): Layout {
       assistant: { x: 0.57, y: 0.13, w: 0.25, h: 0.3 },
       ratemyclub: { x: 0.34, y: 0.38, w: 0.22, h: 0.22 },
       toyyo: { x: 0.55, y: 0.635, w: 0.2, h: 0.11 },
-      tidepool: { x: 0.1, y: 0.78, w: 0.34, h: 0.16 },
-      naugh: { x: 0.855, y: 0.36, w: 0.085, h: 0.24 },
+      tidepool: { x: 0.1, y: 0.78, w: 0.34, h: 0.16, label: 'above' },
+      naugh: { x: 0.855, y: 0.36, w: 0.085, h: 0.24, label: 'left' },
+      bastion: { x: 0.05, y: 0.48, w: 0.12, h: 0.12 },
     },
   };
 }
@@ -443,6 +446,43 @@ export default function World() {
       ctx.fill();
     };
 
+    // Bastion of the Artifact: the glowing artifact on its pedestal, behind a wall of sharpened stakes.
+    const drawBastion = (b: Box, t: number, p: number) => {
+      const q = px(b);
+      const cx = q.x + q.w / 2;
+      const s = Math.min(q.w, q.h);
+      const r = s * 0.16;
+      const oy = q.y + q.h * 0.28 + Math.sin(t * 1.4) * s * 0.03;
+      // The glow breathes, and quickens while you point at it.
+      const halo = ctx.createRadialGradient(cx, oy, r * 0.6, cx, oy, r * (2.4 + 0.5 * Math.sin(t * (2 + p * 4))));
+      halo.addColorStop(0, tone(p, 0.4 + p * 0.3));
+      halo.addColorStop(1, tone(p, 0));
+      ctx.fillStyle = halo;
+      ctx.fillRect(cx - r * 3, oy - r * 3, r * 6, r * 6);
+      ctx.fillStyle = tone(p, 0.6);
+      ctx.fillRect(cx - s * 0.15, q.y + q.h * 0.48, s * 0.3, q.h * 0.05);
+      ctx.fillRect(cx - s * 0.08, q.y + q.h * 0.53, s * 0.16, q.h * 0.27);
+      ctx.fillStyle = tone(p, 0.92 + p * 0.08);
+      ctx.beginPath();
+      ctx.arc(cx, oy, r, 0, 6.3);
+      ctx.fill();
+      ctx.fillStyle = tone(p, 0.8 + p * 0.2);
+      const n = 9;
+      const step = q.w / n;
+      for (let i = 0; i < n; i++) {
+        const x0 = q.x + i * step + step * 0.1;
+        const w = step * 0.8;
+        const top = q.y + q.h * (i % 2 ? 0.74 : 0.68);
+        ctx.beginPath();
+        ctx.moveTo(x0, q.y + q.h);
+        ctx.lineTo(x0, top + w * 0.6);
+        ctx.lineTo(x0 + w / 2, top);
+        ctx.lineTo(x0 + w, top + w * 0.6);
+        ctx.lineTo(x0 + w, q.y + q.h);
+        ctx.fill();
+      }
+    };
+
     let last = performance.now();
     const frame = (now: number) => {
       if (dead) return;
@@ -468,6 +508,8 @@ export default function World() {
       drawGround(t, hy, lay.road * sh, 0.6 + p('toyyo') * 2.4);
       drawTower(lay.boxes.naugh, t, p('naugh'));
       noise(lay.boxes.naugh, static_('naugh'), tick + 5);
+      drawBastion(lay.boxes.bastion, t, p('bastion'));
+      noise(lay.boxes.bastion, static_('bastion'), tick + 6);
       drawSteer(lay.boxes.ratemyclub, t, p('ratemyclub'));
       noise(lay.boxes.ratemyclub, static_('ratemyclub'), tick + 2);
       drawCar(lay.boxes.toyyo, t, p('toyyo'));
@@ -528,7 +570,7 @@ export default function World() {
           fluid: { radius: 0.06, refraction: 0.018, glow: 0.7 },
           tap: 'ring',
           label:
-            'A night scene drawn in characters: a constellation, a longhorn, a car on a road, a koi pond and a tower on a hill. Each one opens a project.',
+            'A night scene drawn in characters: a constellation, a longhorn, a car on a road, a koi pond, a tower on a hill and an orb behind a wall. Each one opens a project.',
         });
       } catch {
         setPlain(true);
@@ -562,6 +604,7 @@ export default function World() {
               key={pr.slug}
               href={`/work/${pr.slug}`}
               className={`hot hot-${pr.slug} cursor-target${active === pr.slug ? ' is-on' : ''}`}
+              data-label={b.label}
               style={{ left: `${b.x * 100}%`, top: `${b.y * 100}%`, width: `${b.w * 100}%`, height: `${b.h * 100}%` }}
               onPointerEnter={() => setHot(pr.slug)}
               onPointerLeave={() => setHot(null)}
