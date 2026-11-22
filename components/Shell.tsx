@@ -14,7 +14,7 @@ function SmoothScroll() {
   const pathname = usePathname();
   useEffect(() => {
     if (pathname === '/' || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    const lenis = new Lenis({ autoRaf: true, lerp: 0.11 });
+    const lenis = new Lenis({ autoRaf: true, lerp: 0.11, anchors: true });
     return () => lenis.destroy();
   }, [pathname]);
   return null;

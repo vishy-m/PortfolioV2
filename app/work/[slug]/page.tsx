@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import FlutedImage from '@/components/FlutedImage';
 import GlyphField from '@/components/GlyphField';
+import Toc from '@/components/Toc';
 import { TLink } from '@/components/Transition';
 import { getProject, projects } from '@/lib/projects';
 
@@ -21,70 +22,46 @@ export default async function Work({ params }: Params) {
   const p = getProject(slug);
   if (!p) notFound();
   const next = projects[(projects.indexOf(p) + 1) % projects.length];
-  const [lead, ...rest] = p.images;
+  const chapters = p.sections.map((s) => ({ ...s, id: s.title.toLowerCase().replace(/[^a-z0-9]+/g, '-') }));
 
   return (
     <main className="page">
-      <h1 className="display">{p.name}</h1>
-      <p className="lede">{p.summary}</p>
+      <h1 className="display work-title">{p.name}</h1>
 
-      {lead ? (
-        <FlutedImage {...lead} />
+      {p.cover ? (
+        <FlutedImage {...p.cover} />
       ) : (
         <GlyphField scene={p.scene} className="hero-field" label={`${p.figure}, drawn in characters. Move across it to stir it.`} />
       )}
 
-      <div className="cols">
-        <dl className="facts">
-          {p.facts.map((f) => (
-            <div key={f.k}>
-              <dt>{f.k}</dt>
-              <dd className={f.hot ? 'key' : undefined}>{f.v}</dd>
-            </div>
+      {p.links.length > 0 && (
+        <p className="links">
+          {p.links.map((l) => (
+            <a key={l.href} href={l.href} className="cursor-target" target="_blank" rel="noreferrer">
+              {l.label}
+            </a>
           ))}
-        </dl>
-        <div className="prose">
-          {p.body.map((t) => (
-            <p key={t.slice(0, 24)}>{t}</p>
-          ))}
-          <p className="links">
-            {p.links.map((l) => (
-              <a key={l.href} href={l.href} className="cursor-target" target="_blank" rel="noreferrer">
-                {l.label}
-              </a>
-            ))}
-          </p>
-        </div>
-      </div>
+        </p>
+      )}
 
-      <div className="sections">
-        {p.sections.map((sec, i) => (
-          <section className="cols sect" key={sec.title}>
-            <h2>
-              <span>{String(i + 1).padStart(2, '0')}</span>
-              {sec.title}
-            </h2>
-            <div className="prose">
-              {sec.body.map((t) => (
-                <p key={t.slice(0, 24)}>{t}</p>
-              ))}
-              {sec.diagram && (
-                <pre className="diagram" role="img" aria-label={`Diagram: ${sec.title}`}>
-                  {sec.diagram}
+      <div className="story">
+        <Toc items={chapters.map(({ id, title }) => ({ id, title }))} />
+        <div>
+          {chapters.map((c) => (
+            <section className="chapter" id={c.id} key={c.id}>
+              <h2>{c.title}</h2>
+              {c.body.map((part, i) =>
+                typeof part === 'string' ? <p key={i}>{part}</p> : <FlutedImage key={part.src} {...part} color />,
+              )}
+              {c.diagram && (
+                <pre className="diagram" role="img" aria-label={`Diagram: ${c.title}`}>
+                  {c.diagram}
                 </pre>
               )}
-            </div>
-          </section>
-        ))}
-      </div>
-
-      {rest.length > 0 && (
-        <div className="gallery">
-          {rest.map((img) => (
-            <FlutedImage key={img.src} {...img} color={!img.dither} />
+            </section>
           ))}
         </div>
-      )}
+      </div>
 
       <TLink href={`/work/${next.slug}`} className="next cursor-target">
         <span>Next project</span>

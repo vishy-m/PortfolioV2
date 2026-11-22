@@ -1,22 +1,21 @@
 export type Slug = 'toyyo' | 'assistant' | 'ratemyclub' | 'tidepool' | 'naugh' | 'bastion';
 
+// A picture. `alt` is also its caption.
+export type Img = { src: string; alt: string; w: number; h: number };
+
 export type Project = {
   slug: Slug;
   name: string;
+  // One sentence for search results and link previews.
   summary: string;
-  // What the figure in the home scene is, in plain words.
+  // What the figure in the home scene is, in plain words. Also labels the hero when there is no cover.
   figure: string;
-  // `hot` marks the one fact worth a second look; it is drawn in the accent colour.
-  facts: { k: string; v: string; hot?: boolean }[];
-  // The short version, next to the facts.
-  body: string[];
-  // The long version: one titled part per idea, with an optional diagram drawn in characters.
-  sections: { title: string; body: string[]; diagram?: string }[];
+  // Leads the page. Without one, the hero is drawn in characters from `scene`.
+  cover?: Img;
+  // The story, one titled section at a time, listed in the index beside it. Pictures sit between
+  // paragraphs, and a diagram drawn in characters can close a section.
+  sections: { title: string; body: (string | Img)[]; diagram?: string }[];
   links: { label: string; href: string }[];
-  // The first image leads the page; the rest make up the gallery. `alt` is also the caption.
-  // Gallery images start in colour; set `dither: true` to start one dithered instead.
-  images: { src: string; alt: string; w: number; h: number; dither?: boolean }[];
-  // Used for the hero when there is no image yet.
   scene?: 'constellation' | 'contour' | 'ripple' | 'mesh';
 };
 
@@ -27,70 +26,65 @@ export const projects: Project[] = [
     summary:
       'Shows a Toyota owner what their car really costs each month and the smartest next move: keep it, buy it out, refinance, repair or replace.',
     figure: 'The car on the road',
-    facts: [
-      { k: 'Result', v: '3rd place, Toyota track, HackUTD 26', hot: true },
-      { k: 'Kind', v: 'Team hackathon build, one weekend in November 2026' },
-      { k: 'Built with', v: 'Next.js, TypeScript, React Three Fiber, MapLibre, Zustand' },
-      { k: 'Models', v: 'Grok, Gemma or Claude, with a calculated fallback' },
-    ],
-    body: [
-      'Toyyo answers one question for an owner: given my situation today, what should I do with my Toyota? We built it for the Toyota Financial Services challenge at HackUTD, where it placed third on the Toyota track.',
-      'It puts the lease or loan, insurance, fuel, driving habits and repairs in one place, ranks the options and shows the assumptions behind each one. Every customer, contract and price in it is synthetic: it is a prototype, not a Toyota product.',
-    ],
+    cover: { src: '/work/toyyo/garage.jpg', alt: 'The opening screen: seven Toyotas drift across a black stage as 3D models', w: 1600, h: 1000 },
     sections: [
       {
-        title: 'A garage, not a form',
+        title: 'Introduction',
         body: [
-          'The app opens on seven Toyotas drifting across a black stage as 3D models, from a 2025 Camry Hybrid to a 2007 Hilux. Pick one and the others fade out. The car turns top-down, slides to the left and keeps driving down a looping country lane while its details fill the right side of the screen.',
-          'Each car carries a different ownership problem: a lease about to run over its mileage, a loan with a rate worth refinancing, a sports car whose insurance is the real cost.',
+          'Owning a car comes with money decisions that are hard to compare: buy out a lease, refinance a loan, pay for a repair or switch cars. The answer depends on payments, insurance, fuel, mileage and driving habits, and that information is scattered across statements and calculators.',
+          'Toyota Financial Services brought this problem to HackUTD 2026 with one question: “Given my situation today, what’s the smartest next move for me and my Toyota?” Toyyo is our team’s answer. Its customers and prices are synthetic: it is a prototype, not a Toyota product.',
         ],
       },
       {
-        title: 'A dashboard that reads like a car',
+        title: 'Purpose',
         body: [
-          'A car page shows the odometer, a row of warning lights and what the car costs every month, split into payment, insurance and fuel. The lights work like the ones on a real dash: they come on only for something worth acting on, such as lease mileage, fuel use against a typical driver, the loan rate, the payment date, coverage that is about to end, or the driving score.',
-          'The Corolla Cross in the demo is on pace to finish about 13,500 miles over its lease allowance, roughly $3,375 in fees. Toyyo compares returning it with buying it out and shows that the buyout comes out about $1,930 ahead.',
+          'Toyyo was meant to give an owner one clear next move. It brings the lease or loan, insurance, fuel, driving and repairs into one place, ranks the options (keep, buy out, refinance, repair or replace) and shows the assumptions behind each one.',
+          'We held to one rule: code calculates and the AI only explains. Advice about money has to be backed by numbers, not just sound convincing, so a language model never produces the figures.',
         ],
       },
       {
-        title: 'Calculated first, explained second',
+        title: 'My role',
         body: [
-          'The figures come from plain TypeScript calculators for lease end, payments, insurance and repairs, not from a language model. Each option lists its upfront cost, its trade-off and the assumptions it rests on, and the sliders for miles per month or driving score recompute the result as you move them.',
-          'The assistant explains those results in plain language, using tool calls to fetch the calculated options. Every dollar amount, percentage and mileage in its reply is checked against the calculated data before it is shown. When no model can be reached, it answers from a fixed template built on the same calculations.',
+          'We were a team of three. I built the 3D opening and the car pages, and the text-message copilot: the iMessage integration, the lease conversation and running the assistant on Grok with tool calls. My teammates built the logo and branding, the repair research, the recommendation system and the repair-planning agent.',
         ],
       },
       {
-        title: 'Driving and repairs',
+        title: 'Process',
         body: [
-          'The driving page lists recent trips with a score, shows what is pulling the score down, and replays any drive on a 3D map with a small car following the route.',
-          'For repairs, you describe what is wrong. Toyyo answers with the likely part, how urgent it is, a cost range and whether the repair is worth doing, then shows nearby shops on a map.',
+          'We started from an earlier Next.js and TypeScript prototype, Next Move Copilot, and renamed it Toyyo. Plain TypeScript calculators work out lease-end costs, payments, insurance and repairs from synthetic customer data. Each option lists its upfront cost, trade-off and assumptions, and sliders such as miles per month rerun the numbers.',
+          { src: '/work/toyyo/finances.jpg', alt: 'The finances page: lease terms, the best next move and a slider to try a different monthly mileage.', w: 1600, h: 1000 },
+          'The assistant explains those results in plain language. It uses tool calls, where the model asks the app to run a function and return the result, to fetch the calculated options. Every number in its reply is checked against that data, and when no model can be reached it answers from a fixed template.',
+          'Last, I added texting through Photon’s Spectrum, a service that connects an app to an iMessage line. When a lease is on pace to run at least 1,000 miles over, Toyyo texts the owner numbered options: drive less, buy it out, switch to a new lease or return it. Replying with a number sends that option’s steps, and a confirm reply creates a simulated dealer packet.',
         ],
       },
       {
-        title: 'It texts you first',
+        title: 'Change in direction',
         body: [
-          'Toyyo also works over iMessage. When a lease is projected to run at least 1,000 miles over, the owner gets a text before the fee becomes expensive. They can reply with a question, or step through the options and confirm one by text.',
-          'A confirmation only creates a simulated packet for the dealer. A customer text can never approve the dealer side, and replying STOP ends the conversation.',
+          'Our first interface was a dashboard with a 3D car beside it, and my plan was to turn it into a guided “walkaround”, a camera circling one car through onboarding steps. I wrote a design document for it, then dropped it overnight. We rebuilt the interface from scratch around a moving carousel of 3D Toyotas, each one a case study, because we wanted an opening screen that caught the eye.',
+          { src: '/work/toyyo/supra.jpg', alt: 'A financed GR Supra, where the warning lights point at the payment date, coverage and driving score.', w: 1600, h: 1000 },
+          'The texting copilot first ran on Google’s Gemma model. Replies took 26 to 38 seconds, and a 45-second limit sometimes cut them off, so the owner got a canned “Live AI is unavailable” text. I moved the copilot to Grok with tool calls, and in tests Grok’s faster model answered a lease question in 8 seconds where its standard model took 36.',
+          'The challenge’s data pack came with “golden answers”, the best move the challenge expected for each customer. Our lease-return costs matched the pack exactly, but our ranking put “buy it out” first for all three customers, where the golden answers differed. On those cars we let the golden answer lead.',
         ],
       },
       {
-        title: 'My part',
+        title: 'Result',
         body: [
-          'I built the 3D opening and the car pages, and the text-message copilot: the messaging integration, the lease conversation and running the assistant on Grok with tool calls. My teammates built the repair research, the recommendation system and the repair-planning agent.',
+          'Toyyo placed 3rd on the Toyota track at HackUTD 2026. The app opens on seven Toyotas, from a 2025 Camry Hybrid to a 2007 Hilux, each with its own ownership problem, such as a lease about to run over its mileage or a loan worth refinancing.',
+          { src: '/work/toyyo/dashboard.jpg', alt: 'A leased Corolla Cross with warning lights on for mileage and fuel, next to its monthly cost.', w: 1600, h: 1000 },
+          'The demo Corolla Cross is on pace to finish about 13,500 miles over its lease, roughly $3,375 in fees. Toyyo shows that buying it out comes out about $1,930 ahead of returning it.',
+          { src: '/work/toyyo/driving.jpg', alt: 'The driving page: the score, what moves it, recent trips and a replay of one drive on a 3D map.', w: 1600, h: 1000 },
+          'The driving page scores recent trips and replays any drive on a 3D map. The text conversation runs from the first warning to a simulated dealer packet.',
+        ],
+      },
+      {
+        title: 'Conclusion',
+        body: [
+          'Our main takeaway is that useful AI helps people make a better-informed decision instead of making it for them. Keeping the math in code made that possible: the numbers stayed testable, and when a model timed out the app could still answer from its calculations.',
+          'The golden answers showed me that a correct calculation is not always the right advice, because a customer’s plans can matter more than the cheapest option. Personalization means understanding someone’s situation, not just showing their name and car.',
         ],
       },
     ],
-    links: [
-      { label: 'Source on GitHub', href: 'https://github.com/vishy-m/Toyyo' },
-      { label: 'Devpost entry', href: 'https://devpost.com/software/toyo-zxjwfe' },
-    ],
-    images: [
-      { src: '/work/toyyo/garage.jpg', alt: 'The opening screen: seven Toyotas drift across a black stage as 3D models', w: 1600, h: 1000 },
-      { src: '/work/toyyo/dashboard.jpg', alt: 'A leased Corolla Cross: two warning lights are on, for mileage and fuel, next to the monthly cost', w: 1600, h: 1000 , dither: true },
-      { src: '/work/toyyo/finances.jpg', alt: 'Finances: the lease terms, the best next move and a slider to try a different mileage', w: 1600, h: 1000 , dither: true },
-      { src: '/work/toyyo/driving.jpg', alt: 'Driving: the score, what moves it, recent trips and a replay of one drive on a 3D map', w: 1600, h: 1000 , dither: true },
-      { src: '/work/toyyo/supra.jpg', alt: 'A financed GR Supra, where the lights point at the payment date, coverage and driving score', w: 1600, h: 1000 , dither: true },
-    ],
+    links: [{ label: 'Source on GitHub', href: 'https://github.com/vishy-m/Toyyo' }, { label: 'Devpost entry', href: 'https://devpost.com/software/toyo-zxjwfe' }],
   },
   {
     slug: 'assistant',
@@ -98,58 +92,32 @@ export const projects: Project[] = [
     summary:
       'A native macOS second brain for students: a command bar one hotkey away, wired into your calendar, your classes and your grades.',
     figure: 'The constellation',
-    facts: [
-      { k: 'Size', v: 'About 16,700 lines of Swift, 279 tests', hot: true },
-      { k: 'Built with', v: 'Swift, SwiftUI and AppKit, SQLite (GRDB), XPC' },
-      { k: 'Talks to', v: 'Google Calendar, and Claude with three fallbacks' },
-      { k: 'When', v: 'May 2026 onward, solo. macOS 13 and later' },
-    ],
-    body: [
-      'Assistant is a menu-bar app for a student juggling classes, clubs and deadlines. Its main surface is not a dashboard. It is a command bar at the bottom of the screen that you summon with a hotkey and type to in plain English: “add PS 5 for data structures due wednesday at midnight”, or “what do I have today?”',
-      'A language model carries out the request against a local database and Google Calendar. Around that bar are full windows for the week, each class, grades and tasks. The screenshots here use a demo database, so the courses, grades and people in them are made up.',
-    ],
+    cover: { src: '/work/assistant/dashboard.jpg', alt: 'The dashboard: classes and to-dos on the left, the week in the middle and the assistant on the right', w: 1800, h: 1168 },
     sections: [
       {
-        title: 'Talk to it from anywhere',
+        title: 'Introduction',
         body: [
-          'Press Control and Space in any app and a panel slides up from the bottom of the screen. Ask one thing and dismiss it, or keep going: the panel grows into a conversation, and a second hotkey reopens the last one where you left off.',
-          'You can also drag a rectangle over any part of the screen, such as a syllabus, an email or a flyer, and attach it to the prompt: “add every due date in this to my calendar.” Each prompt carries the current date, time and time zone, so “next Thursday at 5” becomes an exact time before anything is saved.',
-          'The model works through eight typed tools. It can read today’s plan, list, create and complete tasks, read the calendar and add events, and compute or record a grade. It may take up to eight steps per request, seeing the result of each one, errors included, before it answers.',
+          'A college student juggles classes, clubs, work and internship deadlines at once, each with its own dates. Assistant is a native macOS app for that student, written in Swift for the Mac rather than as a website in a window. It lives in the menu bar, the row of icons at the top of the screen.',
+          'I built it for myself first. It runs on my Mac against my own calendar and classes, so the screenshots on this page use a demo database with made-up courses, grades and people.',
         ],
       },
       {
-        title: 'It speaks first',
+        title: 'Purpose',
         body: [
-          'The app also starts the conversation. A morning briefing covers today’s events and tasks, and an evening one covers what is still open and what is due tomorrow. Reminders arrive ahead of each event, with lead times that depend on what it is: a day and an hour before an exam, ten minutes before a class.',
-          'It also watches for trouble. If three or more deadlines land in the next 48 hours and no study time is blocked, it says so. Briefings wait while a macOS Focus mode is on and are delivered when it ends.',
+          'Before any code, on 13 May 2026, I wrote a design spec. Its main rule was that this is not a dashboard app. You press Control and Space in any app, type in plain English, such as “add PS 5 for data structures due wednesday at midnight”, and a language model carries it out against a local database and Google Calendar, so the change also reaches your phone.',
+          { src: '/work/assistant/overlay.jpg', alt: 'The command bar adds a task, then offers to block time to study for it', w: 1540, h: 780 },
+          'The app also had to speak first, with morning and evening briefings and warnings before deadlines. And it had to keep answering when an AI provider fails, so the spec called for a chain of four models, each standing in for the one before.',
+          { src: '/work/assistant/briefing.jpg', alt: 'A morning briefing, delivered in the same command bar', w: 1540, h: 471 },
         ],
       },
       {
-        title: 'The week in one window',
+        title: 'Process',
         body: [
-          'The dashboard puts the whole week in one place. On the left are the GPA, which stays hidden until you click it, a card for each class, and a to-do list with a progress ring. On the right is the same assistant, with its history saved.',
-          'In the middle is a seven-day calendar of your Google Calendar events, coloured by type: class, office hours, discussion, exam. Task deadlines are drawn as lines at their due time, so you can see work piling up next to the schedule. Click an event to edit it, including how it repeats.',
-        ],
-      },
-      {
-        title: 'A workspace for every class',
-        body: [
-          'Opening a class gives you four resizable panels: its files, a board, its tasks and its week. Their sizes are remembered for each class.',
-          'The board is an infinite whiteboard you can pan and zoom from 25% to 400%. Pin a file to it and it becomes a live card; a pinned PDF scrolls and reads right on the board. On top of that are a pen, an eraser, sticky notes, text and shapes. Drag a box around several things to move or delete them together, and one undo history covers all of it.',
-        ],
-      },
-      {
-        title: 'Grades that answer “what if”',
-        body: [
-          'Each class has weighted categories, such as problem sets at 30%, that can drop the lowest or highest scores. The breakdown shows the current grade, from graded work only, next to a projected grade that fills in the work still to come, and marks where both stand against the grade you are aiming for.',
-          'The GPA is weighted by credit hours and leaves out any class with no graded work yet, so the number stays honest. The assistant can do this too: “I got 47/50 on HW 4 in linear algebra.”',
-        ],
-      },
-      {
-        title: 'Two programs, one app',
-        body: [
-          'The part you see holds no data of its own. Every read and write is a message to a background helper that macOS keeps running even after the app quits. The helper owns the database, the calendar sync, the model calls and the briefing timers, and the two talk over XPC, the system’s channel for messages between processes, through 67 typed calls.',
-          'The helper checks the code signature of whatever connects to it, so another program cannot pose as the app. For briefings the direction reverses: the helper calls back into the app to bring up the command bar.',
+          'I planned each feature in phases and wrote tests first. The first decision was to split the app in two. The menu-bar app holds no data, and a background helper, which macOS keeps running after the app quits, owns the SQLite database, the calendar sync, the model calls and the briefing timers. The two talk over XPC, the system’s channel for messages between programs.',
+          'The core took five days, from 14 to 18 May, in about 170 commits: the database, the model chain, two-way calendar sync with a queue for offline edits, the command bar, briefings, grades and a tasks window. The model works through eight typed tools, such as creating a task or adding an event, and may take up to eight steps per request.',
+          { src: '/work/assistant/tasks.jpg', alt: 'The tasks window: a progress ring, to-dos tagged by class, and a notes scratchpad', w: 1600, h: 1190 },
+          'In June and July I gave each class its own workspace, with a file library and a board for pinning files. The board became an infinite canvas with PDFs that scroll in place, a pen, sticky notes and one undo history. The math behind it lives in six Swift packages that both programs share, so it can be tested without a screen.',
+          { src: '/work/assistant/board.jpg', alt: 'A class workspace: files, a board with a pinned PDF, sticky notes and ink, tasks, and the class week', w: 1600, h: 1189 },
         ],
         diagram: [
           '+------------------------------------------+',
@@ -172,37 +140,31 @@ export const projects: Project[] = [
         ].join('\n'),
       },
       {
-        title: 'A calendar that stays in step',
+        title: 'Change in direction',
         body: [
-          'Everything the app creates goes to its own calendar, named Assistant, in your Google account, so it also shows up on your phone and in any other calendar app. Events are mirrored into the local database every five minutes.',
-          'Edits made offline wait in a queue and are sent on the next sync. A failed write is retried with longer and longer waits, up to an hour. A daily cap on calendar requests keeps the app inside Google’s limits.',
+          'In November I stopped adding features and audited every system instead. It found real bugs: a rejected Google sign-in was retried every five minutes forever, leaving 22,865 “unauthorized” lines in my log, and a retried calendar write could create the same event twice. I split the confirmed findings into nine workstreams, each fixed on its own branch, then merged them into one branch with 486 passing tests.',
+          'On the same branch I also reversed a decision from the spec. API keys had lived in the macOS Keychain, and I moved them to a .env file: a plain list of keys that only my user account can read and that git ignores. I ruled out a hosted store like Supabase, because the helper would still need a local secret and my keys would leave the machine.',
         ],
       },
       {
-        title: 'It keeps answering',
+        title: 'Result',
         body: [
-          'The assistant asks Claude first, then OpenAI, then a hosted Gemma model, then a Gemma model running on the laptop, so it still answers with no connection. A rate limit, an overloaded server or a timeout moves to the next one in line. An error that means the request itself is wrong stops the chain, since asking another model would not help.',
-          'Every reply shows which model wrote it. API keys and the Google sign-in are kept in the macOS Keychain, never in the database.',
+          'The main branch has the command bar, which can also take a cropped screenshot of a syllabus or flyer, plus briefings that wait while a macOS Focus mode is on, the dashboard, class workspaces, grades and tasks. It comes to about 16,700 lines of Swift with 279 tests.',
+          { src: '/work/assistant/classes.jpg', alt: 'One card per class, with its open tasks and sessions this week', w: 1600, h: 452 },
+          'Grades show a current grade from graded work next to a projected one that fills in the work still to come, and the GPA is weighted by credit hours. The assistant can enter grades too: “I got 47/50 on HW 4 in linear algebra.”',
+          { src: '/work/assistant/grades.jpg', alt: 'Grades: weighted categories with a dropped score, and the current grade next to the projected one', w: 1600, h: 1229 },
+          'Two branches are pushed to GitHub but not yet merged, because a trial merge hit conflicts: the audit and secrets work above, and syllabus scanning. That one lets you drop a syllabus into a class folder and have the model propose its exams, assignments and recurring sessions, with nothing created until you approve it.',
         ],
       },
       {
-        title: 'How it was built',
+        title: 'Conclusion',
         body: [
-          'I wrote a design spec and a phased plan for each feature before the code. The logic that can be tested without a screen lives in six Swift packages shared by both programs, covered by 279 tests: grade math, the fallback rules, calendar sync and its offline queue, briefing timing, and the geometry behind the board.',
-          'Still in progress: drop a syllabus into a class folder and its exams, assignments and recurring sessions are offered as events and tasks, with nothing created until you approve it.',
+          'Splitting the app in two meant sync and briefings keep running with the window closed. The cost was that every feature needed a typed call on both sides, and several of the audit’s bugs sat at that boundary, such as late replies landing on the wrong class.',
+          'Planning each feature first helped me grow a command bar into class workspaces in about two months. The audit showed me that passing tests are not the same as an app that holds up over weeks of real use.',
         ],
       },
     ],
     links: [{ label: 'Source on GitHub', href: 'https://github.com/vishy-m/assistant' }],
-    images: [
-      { src: '/work/assistant/dashboard.jpg', alt: 'The dashboard: classes and to-dos on the left, the week in the middle and the assistant on the right', w: 1800, h: 1168 },
-      { src: '/work/assistant/board.jpg', alt: 'A class workspace: files, a board with a pinned PDF, sticky notes and ink, tasks, and the class week', w: 1600, h: 1189 },
-      { src: '/work/assistant/grades.jpg', alt: 'Grades: weighted categories with a dropped score, and the current grade next to the projected one', w: 1600, h: 1229 },
-      { src: '/work/assistant/briefing.jpg', alt: 'A morning briefing delivered in the command bar', w: 1540, h: 471 },
-      { src: '/work/assistant/classes.jpg', alt: 'One card per class, with its tasks and sessions this week', w: 1600, h: 452 },
-      { src: '/work/assistant/overlay.jpg', alt: 'The command bar in a conversation: it adds a task, then offers to block study time', w: 1540, h: 780 },
-      { src: '/work/assistant/tasks.jpg', alt: 'Tasks: a progress ring, to-dos tagged by class, and a notes scratchpad', w: 1600, h: 1190 },
-    ],
     scene: 'constellation',
   },
   {
@@ -211,56 +173,62 @@ export const projects: Project[] = [
     summary:
       'Reviews and discovery for UT Austin student organizations, so you can find out what a club is like before you join.',
     figure: 'The longhorn',
-    facts: [
-      { k: 'Live at', v: 'ratemyclub.info', hot: true },
-      { k: 'Directory', v: '1,038 UT organizations in 27 categories' },
-      { k: 'Built with', v: 'Flask, React, Supabase, Vercel' },
-      { k: 'When', v: 'March to April 2026, team of four' },
-    ],
-    body: [
-      'UT Austin has more than a thousand student organizations, and the official directory tells you what each one says about itself. Rate My Club adds what members say.',
-      'Students sign in, review the clubs they have been part of and rate each one. Anyone can search the directory, filter it and read the reviews.',
-    ],
+    cover: { src: '/work/ratemyclub/home.jpg', alt: 'The home page: one search box and a longhorn drawn in dots', w: 1600, h: 1000 },
     sections: [
       {
-        title: 'Find a club',
+        title: 'Introduction',
         body: [
-          'The home page is a single search box. Behind it is the full directory: 1,038 organizations pulled from HornsLink, the university’s own listing, each with a short description written for the card.',
-          'You can narrow the list by 27 categories, from Engineering & Robotics to Music, Dance & Performance, and by three sliders that set how strong a club should be on professional, academic and social value.',
+          'UT Austin has more than a thousand student organizations. The official directory, HornsLink, lists them, but each listing is written by the club itself: it tells you what a club wants to be, not what being a member is like.',
+          'For a student choosing where to spend their time, the usual answer is to ask around, which only works if you already know someone in the club. Rate My Club is a review site for these organizations, so what members say sits next to what the club says.',
         ],
       },
       {
-        title: 'Three ratings, not one',
+        title: 'Purpose',
         body: [
-          'A single star rating hides why people join clubs. A review here scores a club separately on academic, social and professional value, with an overall score beside them.',
-          'A club’s page shows those averages and the review feed next to its official details: the overview, who can join, what members do, and its links. When someone edits a review, the earlier version is kept as a revision instead of being overwritten.',
+          'The goal was to let any student find out what a club is like before joining. Anyone can search the full directory and read reviews, and students who sign in can review the clubs they have been part of.',
+          'Each review scores a club on academic, social and professional value, with an overall score beside them. People join clubs for different reasons, and a single star rating hides which of those a club is good at.',
         ],
       },
       {
-        title: 'Summaries on a budget',
+        title: 'My role',
         body: [
-          'Once a club has ten reviews, a short AI-written summary appears at the top of its page. It is rewritten only after ten more reviews arrive, not on every visit, and the model is sent at most forty reviews, each trimmed to a few sentences. That keeps the summary current while the model bill stays close to nothing.',
+          'We were a team of four. My teammates wrote the first backend endpoints (the URLs the site calls to read or change data) for creating, rating and editing reviews, their tests, and register and login.',
+          'I built the front end, the part that runs in the browser, and its dot-matrix look. I connected it to the backend, wrote the script that imports the club directory, set up the deployment, added the AI summaries, and did the security pass and the phone layout.',
         ],
       },
       {
-        title: 'The unglamorous parts',
+        title: 'Process',
         body: [
-          'A good share of the work went into things nobody sees. Sign-in uses a cookie that scripts on the page cannot read, and every write is checked to come from the site itself. Requests are rate limited per visitor. Public pages read from a separate table that holds only the columns that are safe to show, so private details never leave the server.',
+          'We started in late March with the backend, a Flask app (Flask is a small Python web framework). The data lives in Supabase, a hosted Postgres database with sign-in built in. When someone edits a review, the old version is kept as a revision instead of being overwritten.',
+          'Next came the clubs. I wrote a script that pulls every organization from HornsLink’s public API and retries when a request fails. A second script used a language model running on my own machine to write a short description for each club card, and the backend sorts clubs into categories from their HornsLink labels plus keyword rules.',
+          { src: '/work/ratemyclub/directory.jpg', alt: 'The imported directory, with sliders for professional, academic and social fit on the left', w: 1600, h: 900 },
+          'In mid-April I connected the React front end to the backend and deployed both on Vercel, then added AI summaries of each club’s reviews. The last week went into security and the phone layout. Sign-in uses a cookie that scripts on the page cannot read, every write must come from the site itself, and each visitor can only send so many requests at a time. Public pages read from a separate table that holds only the columns that are safe to show.',
         ],
       },
       {
-        title: 'My part',
+        title: 'Change in direction',
         body: [
-          'I built the front end and its dot-matrix look, connected it to the Flask backend, set up the deployment, added the AI summaries and did the security pass and the phone layout. My teammates wrote the first review and sign-in endpoints.',
+          'My first front end, added in early April, was built around visuals: video backgrounds, a 3D model of Bevo, the UT longhorn mascot, and images of the UT Tower. It grew out of a prototype I made in late March and was not yet connected to the backend.',
+          'When I joined the two in mid-April, I rebuilt the front end around what a student does on the site: search, browse, open a club and write a review. A day later I deleted the old code, videos and 3D models, and over the next week I kept simplifying the club cards and descriptions.',
+        ],
+      },
+      {
+        title: 'Result',
+        body: [
+          'Rate My Club is live at ratemyclub.info. The home page is a single search box over 1,038 UT organizations in 27 categories, and three sliders filter clubs by how strong they should be on professional, academic and social value. Behind it is one Flask file of about 2,500 lines with 16 routes.',
+          'A club’s page shows its three averages and the review feed next to its official details: the overview, who can join, what members do, and its links. Once a club has ten reviews, a short AI summary appears at the top. It is rewritten only after ten more arrive, and the model sees at most forty reviews, each cut to 420 characters, so the cost stays close to nothing.',
+          { src: '/work/ratemyclub/club.jpg', alt: 'A club’s page: its three ratings, the review feed and the official overview', w: 1600, h: 900 },
+        ],
+      },
+      {
+        title: 'Conclusion',
+        body: [
+          'Once the site was deployed, most of my commits went into fixes, security, the phone layout and how public data is read, not new features. That taught me that the part people see is a small share of a working web app.',
+          'It also showed me that cost limits can be simple: a few fixed rules about when to call the model kept the AI summaries affordable. The next problem is getting enough students to write reviews, since every feature here depends on them.',
         ],
       },
     ],
     links: [{ label: 'Visit ratemyclub.info', href: 'https://ratemyclub.info' }],
-    images: [
-      { src: '/work/ratemyclub/home.jpg', alt: 'The home page: one search box and a longhorn drawn in dots', w: 1600, h: 1000 },
-      { src: '/work/ratemyclub/directory.jpg', alt: 'The directory, with sliders for professional, academic and social fit on the left', w: 1600, h: 900 },
-      { src: '/work/ratemyclub/club.jpg', alt: 'A club’s page: its three ratings, the review feed and the official overview', w: 1600, h: 900 },
-    ],
     scene: 'contour',
   },
   {
@@ -269,60 +237,60 @@ export const projects: Project[] = [
     summary:
       'A macOS menu-bar app that puts a live, interactive web page behind your desktop icons, with ASCII animals that react to your cursor.',
     figure: 'The koi pond',
-    facts: [
-      { k: 'Ships with', v: 'Nine wallpapers, seven kinds of animal', hot: true },
-      { k: 'Built with', v: 'Swift, WKWebView, JavaScript, HTML canvas' },
-      { k: 'Runs on', v: 'macOS 14 and later' },
-      { k: 'When', v: 'November 2026, solo' },
-    ],
-    body: [
-      'Tidepool replaces a still wallpaper with a web page that keeps running behind your icons. It ships with a set of animals drawn entirely in characters: koi, jellyfish, frogs, dragonflies, crabs, cranes and butterflies, each with its own way of moving.',
-      'They notice you. Click the pond and the koi come for food. Click near the jellyfish and they jet away. This site borrows its look from that project.',
-    ],
+    cover: { src: '/work/tidepool/eco-shallows.png', alt: 'The shallows of the ASCII Ecosystem wallpaper: koi, frogs and dragonflies among lily pads', w: 1440, h: 810 },
     sections: [
       {
-        title: 'A page where the wallpaper goes',
+        title: 'Introduction',
         body: [
-          'Each screen gets a borderless window that sits above the system wallpaper and below the Finder’s icons. The window holds a web view, so a wallpaper is an ordinary HTML page.',
+          'Tidepool started with a website: a page of animals drawn in ASCII art, meaning pictures made only from text characters, that react when you tap them. I wanted something like it on my own Mac, behind my desktop icons.',
+          { src: '/work/tidepool/cranes.png', alt: 'ASCII Cranes: a flock of paper cranes made only from text characters.', w: 1440, h: 810 },
+          'The desktop is the screen I see between every app, but a wallpaper usually just sits there. Tidepool is a small macOS menu-bar app that puts a live web page where the wallpaper goes. I built it on my own over one weekend in November 2026.',
         ],
       },
       {
-        title: 'Clicks that reach the desktop',
+        title: 'Purpose',
         body: [
-          'A window at that level never receives the mouse, so the app does the listening itself. It follows the cursor and watches for clicks across the whole system, and passes one to the wallpaper only when no app window covers that spot. The animals react when you click the bare desktop, not when you click a button in another app.',
-          'Drawing stops while the wallpaper is paused or completely hidden behind other windows, so it costs nothing when you cannot see it.',
+          'I wanted an interactive wallpaper: one where I could set different things and the wallpaper would respond. That meant the animals had to react to clicks on the bare desktop, each wallpaper needed its own settings, and the app had to stay out of the way while I worked.',
+          'I made each wallpaper an ordinary web page. The Mac side then only has to show the page and hand it the cursor, clicks and settings, and anyone who can build a web page can make a new wallpaper.',
         ],
       },
       {
-        title: 'Animals with habits',
+        title: 'Process',
         body: [
-          'Every creature is one small script on top of a shared engine. The engine owns the character grid, the backdrop, the ripples and the frame loop; the script says how its animals move and stamps their shapes into the grid.',
-          'Frogs sit, then leap. Dragonflies hover, then dart. Crabs bolt when you click, and butterflies scatter. Each wallpaper has settings for how many animals there are, how they move, their colour, and whether they follow, flee from or ignore the cursor.',
+          'I built Tidepool with Claude Code, an AI coding assistant: I described what I wanted, ran each build on my desktop and reported what felt wrong. The Swift app opens a borderless window on each screen, above the system wallpaper and below the Finder’s icons, holding a WKWebView, the part macOS apps use to show web pages. The first wallpaper was ASCII Pond.',
+          { src: '/work/tidepool/pond.png', alt: 'ASCII Pond, the first wallpaper: click the desktop and the koi come for food.', w: 1440, h: 810 },
+          'That window never receives the mouse, so the app listens for itself: it checks the cursor 60 times a second and passes a click on only when no app window covers that spot. This caused the trickiest bug. macOS lists the pointer as a small window named “Cursor” that covers the spot under the mouse, so while it existed every click was rejected. The fix was to check which window the click was actually sent to.',
+          { src: '/work/tidepool/frogs.png', alt: 'ASCII Frogs: each animal has its own habits, and frogs sit, then leap.', w: 1440, h: 810 },
+          'Then came six more animals: jellyfish, butterflies, dragonflies, crabs, frogs and paper cranes. They share one engine for the character grid, ripples and frame loop, so each creature is one small script describing how it moves. Each wallpaper’s manifest.json file lists its settings, and the app builds the settings panel from it.',
         ],
       },
       {
-        title: 'One drifting world',
+        title: 'Change in direction',
         body: [
-          'The ASCII Ecosystem wallpaper puts all of them in one place. The view drifts slowly from open sea past a koi pond, lily-pad shallows, a beach and a meadow to a lake, then back again.',
+          'At first the animals reacted to the cursor: koi drifted toward it and the water rippled as it moved. Behind real work that felt like phantom clicks. So I changed the default: now only a real click on the bare desktop scatters animals or drops food, and following or fleeing the cursor became a setting.',
+          { src: '/work/tidepool/jellyfish.png', alt: 'ASCII Jellyfish: a click near them makes them jet away.', w: 1440, h: 810 },
+          'The bigger change was turning separate wallpapers into one world, a view that drifts from koi in the water to frogs on lily pads to crabs on a beach. That became ASCII Ecosystem. The first version switched places too suddenly, so I added in-between stretches such as a reef, a reed bed and dunes, with rocks, logs and flowers the animals use: frogs catch dragonflies, crabs climb rocks and cranes rest on logs.',
+          { src: '/work/tidepool/eco-beach.png', alt: 'The beach in the Ecosystem, where crabs walk the line between water and sand.', w: 1440, h: 810 },
+          'Then it felt crowded and restless. I cut the scenery by about 40% and the animals by about a third, and made them rest longer: frogs now sit for 7 to 30 seconds between leaps instead of 1 to 4.',
         ],
       },
       {
-        title: 'Make your own',
+        title: 'Result',
         body: [
-          'A wallpaper is a folder with an HTML page and a short manifest that lists its settings. The settings panel in the app is generated from that list, and the page is handed the cursor position, clicks on the desktop and pause events, so anyone who can write a web page can write a wallpaper.',
+          'Tidepool runs on macOS 14 and later, and its source is public on GitHub. It ships with nine wallpapers and seven kinds of animal: one wallpaper per animal, a Compass Field whose needles turn toward the cursor, and the Ecosystem, which drifts from open sea to a lake and back. You pick between them in a dashboard of live previews.',
+          { src: '/work/tidepool/eco-lake.png', alt: 'The lake at the far end of the Ecosystem, with cranes, before the view drifts back.', w: 1440, h: 810 },
+          'It makes no network requests. In tests in a headless browser (one that runs without a window), the Ecosystem held 60 frames per second, and the app used about 0.4% of the CPU while the wallpaper was paused or covered. After the last fixes, a koi simulation with three koi left 0 food pellets uneaten, down from 68. This site borrows its look from Tidepool.',
+        ],
+      },
+      {
+        title: 'Conclusion',
+        body: [
+          'The animals were the fun part, but the real work was deciding what counts as a click on the desktop, a question that only exists because the wallpaper window cannot receive the mouse. Measuring things, like koi feeding in a repeatable simulation, let me show a fix worked instead of guessing.',
+          'I also learned to judge motion by living with it. Ideas that sounded good, like animals that follow the cursor, felt wrong once they sat behind my real work, and the calmer, sparser version is the one I kept.',
         ],
       },
     ],
     links: [{ label: 'Source on GitHub', href: 'https://github.com/vishy-m/Tidepool' }],
-    images: [
-      { src: '/work/tidepool/eco-shallows.png', alt: 'The shallows of the ASCII Ecosystem wallpaper: koi, frogs and dragonflies among lily pads', w: 1440, h: 810 },
-      { src: '/work/tidepool/pond.png', alt: 'ASCII Pond: koi drawn in characters; click to drop food', w: 1440, h: 810 },
-      { src: '/work/tidepool/jellyfish.png', alt: 'ASCII Jellyfish: click near them and they jet away', w: 1440, h: 810 },
-      { src: '/work/tidepool/frogs.png', alt: 'ASCII Frogs: they sit, then leap', w: 1440, h: 810 },
-      { src: '/work/tidepool/cranes.png', alt: 'ASCII Cranes: a flock of paper cranes', w: 1440, h: 810 },
-      { src: '/work/tidepool/eco-beach.png', alt: 'The beach in the Ecosystem wallpaper, with crabs at the waterline', w: 1440, h: 810 },
-      { src: '/work/tidepool/eco-lake.png', alt: 'The lake at the far end of the Ecosystem, with cranes', w: 1440, h: 810 },
-    ],
   },
   {
     slug: 'naugh',
@@ -330,52 +298,64 @@ export const projects: Project[] = [
     summary:
       'A top-down action game: escape a demon’s castle dungeon in five minutes. We built it in C# for a class; I ported it to the browser, so you can play all of it here.',
     figure: 'The tower on the hill',
-    facts: [
-      { k: 'Play it', v: 'In the browser, all three floors', hot: true },
-      { k: 'Kind', v: 'Class project, team of four; ported to the web in November 2026' },
-      { k: 'Built with', v: 'C# and XNA, then TypeScript, Canvas 2D and Web Audio' },
-      { k: 'Controls', v: 'Keyboard or gamepad, so not on a phone' },
-    ],
-    body: [
-      'The Island of Naugh began as a team project for a Video Game Programming class, written in C# with Microsoft’s XNA framework. Lightning splits your boat in a storm, and you wake in the castle dungeon of the demon Chax with five minutes to fight your way out.',
-      'XNA runs only on Windows and Microsoft stopped developing it in 2013, so the original is hard to run today. I ported it to TypeScript so it runs in any browser, keeping every sprite, sound, level map and line of dialogue from the original.',
-    ],
+    cover: { src: '/work/naugh/title.jpg', alt: 'The title screen: Chax looms over the boat that carries you to the island', w: 1600, h: 1000 },
     sections: [
       {
-        title: 'Three floors, one clock',
+        title: 'Introduction',
         body: [
-          'The dungeon comes first. The bars of your cell shock you only while you move, so you wait for them to go dark and slip out. Keys bounce around the room and only one opens the gate. It starts out tinted red, then turns white like the decoys a second after you leave the cell, and every decoy you grab spawns another. Past the gate are a sword and twenty husks.',
-          'The forest is a maze full of red spirits that drift through its walls. At the end waits Chax. He charges from a distance, opens a giant eye under you up close, and after five attacks summons knights and cannot be hurt until they are gone. One five-minute clock covers all three floors; it stops only while Chax is talking.',
+          'The Island of Naugh is a top-down action game that four of us made for a Video Game Programming class. We wrote it in C# with XNA, Microsoft’s framework for making Windows games, in Visual Studio 2019.',
+          'Lightning splits your boat in a storm, and you wake in a cell in the castle dungeon of the demon Chax. You have five minutes to get through three floors: the dungeon, a forest maze, and Chax himself.',
+          { src: '/work/naugh/dungeon.jpg', alt: 'The cell you start in. Its bars shock you only while you move.', w: 1600, h: 1000 },
+          'XNA runs only on Windows, and Microsoft stopped developing it in 2013, so the original is hard to run today. The fix was to move it somewhere everyone already has: the web browser.',
         ],
       },
       {
-        title: 'A port, not a remake',
+        title: 'Purpose',
         body: [
-          'Each TypeScript module stands in for one or more of the original C# classes, and the game logic was carried over line by line: the same speeds, damage numbers, timers and animation frames. It runs at a fixed 60 updates a second, as XNA did, so it plays at the same speed on any screen.',
-          'The levels are the original text-file tile maps, loaded unchanged. The art was scaled down and the sounds converted from WAV to MP3, so the whole game is a download of under 4 MB.',
+          'The goal of the game is to escape the island by defeating Chax, who commands the enemies that attack you. The team version had the parts of a finished game: an intro cutscene, three floors, a boss with dialogue, a death scene and one clock over all of it.',
+          'My purpose with the port was to make that same game playable in any browser, with nothing to install. I wanted a port, not a remake, so I kept every sprite, sound, level map and line of dialogue.',
         ],
       },
       {
-        title: 'What the browser needed',
+        title: 'My role',
         body: [
-          'Browsers will not play sound until the visitor presses something, so the game now opens on a title screen. It pauses when its tab loses focus, a gamepad works through the browser’s Gamepad API, and the flashing cutscene backgrounds hold still for anyone who has turned on reduced motion.',
+          'We built the original as a team of four, and the design, levels, code and dialogue all come from that version. The browser port is mine: I went through the C# code and assets, rewrote the game in TypeScript, tested it and fixed what broke on the way.',
         ],
       },
       {
-        title: 'Fixed on the way',
+        title: 'Process',
         body: [
-          'Some of the original’s bugs did not make the move. Walls used direction-tagged tiles that let you sink in and get stuck; they now use a slightly smaller hitbox that slides you around corners. A dash no longer freezes when you let go of the keys. Chax’s first charge used to rush at the top-left corner of the map; now it winds up like the rest, and his charge and slam are telegraphed by a red line and a red square.',
-          'The dialogue is untouched, typos and all. It only types faster, and a line that arrives while another is showing now waits its turn instead of being dropped.',
+          'I started by reading through the original’s code and assets, then rebuilt the game in TypeScript with Vite, a build tool, drawing to a Canvas 2D element and playing sound through the Web Audio API, with no game engine. Each TypeScript module stands in for one or more of the original C# classes.',
+          'The logic was carried over line by line. The port runs at a fixed 60 updates a second, as XNA did, so the original speeds, damage numbers and timers work unchanged on any screen. The levels load from the original text-file maps, and converting the sounds from WAV to MP3 and shrinking oversized images took the assets from about 16 MB to under 3 MB.',
+          'I tested it by playing it through in a headless browser, one driven by a script. A second review against the C# found gameplay that had drifted: enemies were about 35% too fast and Chax took half the damage he should. Both came from quirks in the original, which cuts the fraction off each enemy step and updates the sword twice per frame in Chax’s room, so I copied them.',
+        ],
+      },
+      {
+        title: 'Change in direction',
+        body: [
+          'The original was planned as a Windows game, and the browser needed things XNA never did. Browsers block sound until the visitor presses something, so the game now opens on a title screen. It also pauses when its tab loses focus, supports gamepads through the browser’s Gamepad API, and stills the flashing cutscene backgrounds when reduced motion is turned on.',
+          'I also fixed bugs from the original. Walls used to let you sink in and get stuck; they now use a slightly smaller hitbox that slides you around corners. A dash no longer freezes when you let go of the keys. Chax’s first charge used to rush at the top-left corner of the map; now it winds up like the rest, and a red line and a red square warn you before his charge and slam.',
+          { src: '/work/naugh/boss.jpg', alt: 'Chax’s eye opening under the player. It hurts only once it has opened.', w: 1600, h: 1000 },
+          'What I did not change was the writing. Every line of dialogue matches the original character for character, typos included. It only types faster, and a line that arrives during another now waits instead of being dropped.',
+        ],
+      },
+      {
+        title: 'Result',
+        body: [
+          'The whole game is playable on this site, from the intro to the win screen. It needs a keyboard or a gamepad, so it does not work on a phone.',
+          { src: '/work/naugh/forest.jpg', alt: 'The forest, a maze where red spirits drift through the walls.', w: 1600, h: 1000 },
+          'It is a download of under 4 MB and held a steady 60 frames a second in testing. The win screen now shows the original’s game-complete art, which the team version never displayed.',
+        ],
+      },
+      {
+        title: 'Conclusion',
+        body: [
+          'Porting it taught me that being faithful means keeping some of the accidents. The enemies and the boss fight only matched the original once I copied two of its quirks, while real bugs, like getting stuck in walls, were worth fixing.',
+          'It also showed me how much a framework like XNA does for you: the game loop, input, audio and sprite drawing all had to be rebuilt by hand. A class project that had become hard to run is now one link away.',
         ],
       },
     ],
     links: [{ label: 'Play the game', href: '/play/island-of-naugh/index.html' }],
-    images: [
-      { src: '/work/naugh/title.jpg', alt: 'The title screen: Chax looms over the boat that carries you to the island', w: 1600, h: 1000 },
-      { src: '/work/naugh/dungeon.jpg', alt: 'The cell you start in: its bars shock you only while you move', w: 1600, h: 1000 },
-      { src: '/work/naugh/forest.jpg', alt: 'The forest, a maze where red spirits drift through the walls', w: 1600, h: 1000 },
-      { src: '/work/naugh/boss.jpg', alt: 'Chax, with his eye opening under the player', w: 1600, h: 1000 },
-    ],
   },
   {
     slug: 'bastion',
@@ -383,55 +363,69 @@ export const projects: Project[] = [
     summary:
       'A base-building tower-defense game in Unreal Engine 5: a runaway knight guards a stolen artifact from the kingdom that wants it back. I built the movement, the animation and most of the weapons.',
     figure: 'The knight',
-    facts: [
-      { k: 'My part', v: 'All of the movement and animation, most of the weapons', hot: true },
-      { k: 'Kind', v: 'Class project for Video Game Programming 2, team of ten' },
-      { k: 'Built with', v: 'Unreal Engine 5, in Blueprints' },
-      { k: 'Plays on', v: 'PC, with keyboard and mouse' },
-    ],
-    body: [
-      'Bastion of the Artifact was the team project for a Video Game Programming 2 class: ten of us building one game in Unreal Engine 5, all in Blueprints, the engine’s visual scripting. You play a knight who deserted an evil kingdom and took the artifact it runs on, and the kingdom wants it back.',
-      'You chop trees and mine ore, smelt bars in a furnace, build a fort around the artifact and set turrets on its walls, then fight off the soldiers sent to take it. My part was the knight himself: how he moves, how he animates and how he fights.',
-    ],
+    cover: { src: '/work/bastion/fire-sword.jpg', alt: 'A fire sword mid-swing, leaving a trail of flame', w: 1384, h: 745 },
     sections: [
       {
-        title: 'Moving like a knight',
+        title: 'Introduction',
         body: [
-          'The knight walks, sprints, crouches, slides, dodges with a short roll and double jumps. Sprinting doubles his speed and drains a stamina bar that refills once he slows down, and C swaps the camera between first and third person at any time.',
-          'Movement lives in its own component on the character, with a named state for each kind of move, and sliding has a component of its own.',
+          'Bastion of the Artifact is a game ten of us built in Unreal Engine 5 for a CTE Video Game Programming 2 class. We made it in Blueprints, the engine’s visual scripting, where you connect nodes instead of typing code.',
+          'You play a knight who deserted an evil kingdom and stole the artifact it runs on. The kingdom sends waves of soldiers to take it back, so you gather materials, build a fort around the artifact and defend it with turrets: a mix of base building and tower defense.',
+          { src: '/work/bastion/artifact.jpg', alt: 'The artifact on its pedestal: the whole game is about defending it.', w: 666, h: 374 },
+          'We designed it for PC, played with a keyboard and mouse. We aimed it at players from thirteen to twenty-five.',
         ],
       },
       {
-        title: 'An animation layer per weapon',
+        title: 'Purpose',
         body: [
-          'The knight has one base animation blueprint for moving, plus a separate animation layer for each weapon. Equip the sword and its layer supplies the idle, walk, run and jump; switch to the bow and the bow’s layer takes over. A new weapon brings its own layer instead of growing one huge graph.',
-          'The two emotes use the same layering, so adding a third is one more animation.',
+          'We planned the story and mechanics on paper first. Our design documents describe a single-player base builder: by day you gather resources and expand your fort, and at night the kingdom raids it.',
+          'It was also how we learned Unreal: our first design document says we hoped to figure out animation and modeling in it. The plan was to show the finished game at the class’s showcase event.',
         ],
       },
       {
-        title: 'Weapons that share one blueprint',
+        title: 'My role',
         body: [
-          'Every weapon is a child of one base weapon, which holds what they all need: where it rests on the body, where it sits in the hand, its animations, its basic stats and its attack. Picking one up attaches it at its resting spot; equipping plays a draw animation, and the weapon moves to the hand partway through it.',
-          'The sword attacks in a chain of three slashes. The bow draws, aims at a crosshair and fires arrows. The swords also come in fire, wind and lightning, each leaving its own trail.',
+          'My part was the knight: how he moves, animates and fights. I built all of the movement, the animation behind it and most of the weapons system.',
+          'The rest of the team made the character and weapon models, the enemies, base building, the turrets, the resources and the map. In our first design document I also wrote the game outline, the first draft of the story.',
         ],
       },
       {
-        title: 'My part',
+        title: 'Process',
         body: [
-          'I built all of the movement and the animation behind it, and most of the weapons system. The rest of the team made the character and weapon models, the enemies, base building and the turrets, and the map with its day and night cycle.',
+          'I started with movement. The knight walks, sprints, crouches, slides, rolls and double jumps, and C toggles first and third person. Sprinting doubles his speed and drains a stamina bar. It all lives in a movement component, a reusable piece of logic attached to the character, with a named state for each kind of move.',
+          { src: '/work/bastion/running.jpg', alt: 'The knight at a sprint.', w: 1318, h: 1318 },
+          'Next came animation. One base animation blueprint, the graph that picks which animation plays each frame, handles moving, and each weapon adds its own animation layer on top. Equip the bow and its layer supplies the idle, walk and run, so no single graph grows huge.',
+          { src: '/work/bastion/bow.jpg', alt: 'The bow’s animation layer at work: draw, aim at the crosshair, release.', w: 720, h: 586 },
+          'Then I built the weapons on one shared parent that holds where a weapon rests on the body, where it sits in the hand, its animations, its stats and its attack. Equipping plays a draw animation that moves the weapon into the hand partway through. The sword attacks in a chain of three slashes, and the bow aims at a crosshair and fires arrows.',
+        ],
+      },
+      {
+        title: 'Change in direction',
+        body: [
+          'The game started with no name, was called “Barbanium”, also known as “Fortress Castle”, in the fifty-page design document, and finished as Bastion of the Artifact. The first plan was a first-person base builder; the final game switches between first and third person. The story shrank from a rebellion guarding a magic orb to one runaway knight and the artifact he stole.',
+          'The weapon list got smaller too. We planned daggers, hammers, a crossbow with magic arrows and even a pistol, and finished with a bow and three swords: fire, wind and lightning. The design document had planned for this, with free-use animations as the backup if the deadline ran short.',
+          { src: '/work/bastion/lightning-sword.jpg', alt: 'The lightning sword and its purple trail.', w: 1415, h: 710 },
+          'The first map was, in our own words, cool looking but not practical, so it was replaced with one over four times bigger. The old grass, a single object, lagged and was hard to place, so we switched to planar grass made of flat planes, which animates properly and runs lighter.',
+        ],
+      },
+      {
+        title: 'Result',
+        body: [
+          'The finished knight does everything in the control scheme. He picks up the sword or the bow, equips it from the hotbar and fights with animations that match the weapon in his hand.',
+          { src: '/work/bastion/wind-sword.jpg', alt: 'The wind sword’s trail, with the hotbar below.', w: 1409, h: 846 },
+          'Around him, the team built the rest of the loop. You chop trees, mine ore, smelt bars at a furnace and build a fort from wood, stone and crystal pieces that snap together. Turrets aim at enemies on their own and have an upgrade tree.',
+          { src: '/work/bastion/base.jpg', alt: 'An example base from the team’s building system: palisade, stone keep and stairs.', w: 1205, h: 844 },
+          'Four kinds of enemies attack, and a day and night cycle shifts over time to create seasons. We showed all of it in our final presentation.',
+        ],
+      },
+      {
+        title: 'Conclusion',
+        body: [
+          'The main thing I learned was to build for other people. With ten of us in one project, a new weapon had to be one child blueprint and one animation layer, not a rewrite of the knight.',
+          'I also learned how a plan meets a deadline. We designed far more than we built, and a smaller set that worked together beat the long list.',
         ],
       },
     ],
     links: [],
-    images: [
-      { src: '/work/bastion/fire-sword.jpg', alt: 'A fire sword mid-swing, leaving a trail of flame', w: 1384, h: 745 },
-      { src: '/work/bastion/wind-sword.jpg', alt: 'The wind sword’s trail, with the hotbar below', w: 1409, h: 846 },
-      { src: '/work/bastion/lightning-sword.jpg', alt: 'The lightning sword and its purple trail', w: 1415, h: 710 },
-      { src: '/work/bastion/bow.jpg', alt: 'The bow: draw, aim at the crosshair, loose', w: 720, h: 586 },
-      { src: '/work/bastion/running.jpg', alt: 'The knight at a run', w: 1318, h: 1318 },
-      { src: '/work/bastion/artifact.jpg', alt: 'The artifact on its pedestal, the thing the whole game defends', w: 666, h: 374 },
-      { src: '/work/bastion/base.jpg', alt: 'An example base from the team’s building system: palisade, stone keep and stairs', w: 1205, h: 844 },
-    ],
   },
 ];
 
