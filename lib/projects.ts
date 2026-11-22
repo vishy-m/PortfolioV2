@@ -257,7 +257,7 @@ export const projects: Project[] = [
       {
         title: 'Process',
         body: [
-          'I built Tidepool with Claude Code, an AI coding assistant: I described what I wanted, ran each build on my desktop and reported what felt wrong. The Swift app opens a borderless window on each screen, above the system wallpaper and below the Finder’s icons, holding a WKWebView, the part macOS apps use to show web pages. The first wallpaper was ASCII Pond.',
+          'The Swift app opens a borderless window on each screen, above the system wallpaper and below the Finder’s icons, holding a WKWebView, the part macOS apps use to show web pages. The first wallpaper was ASCII Pond.',
           { src: '/work/tidepool/pond.png', alt: 'ASCII Pond, the first wallpaper: click the desktop and the koi come for food.', w: 1440, h: 810 },
           'That window never receives the mouse, so the app listens for itself: it checks the cursor 60 times a second and passes a click on only when no app window covers that spot. This caused the trickiest bug. macOS lists the pointer as a small window named “Cursor” that covers the spot under the mouse, so while it existed every click was rejected. The fix was to check which window the click was actually sent to.',
           { src: '/work/tidepool/frogs.png', alt: 'ASCII Frogs: each animal has its own habits, and frogs sit, then leap.', w: 1440, h: 810 },
